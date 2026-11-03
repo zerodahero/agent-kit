@@ -6,28 +6,35 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate plugins
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Install tools from mise.toml
         uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
 
-      - name: Check the review method copies match
-        run: scripts/check-review-method.sh
-
-      - name: Check the plugin and package versions match
-        run: scripts/check-versions.sh
+      - name: Run the hk checks
+        run: hk check --all
+        env:
+          # pinact verifies pinned SHAs against the GitHub API.
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Check the opencode plugin parses
         run: node --check opencode/plugin.js
 
       - name: Install Claude Code
-        run: npm install -g @anthropic-ai/claude-code
+        # Installed here rather than in mise.toml, which would shadow the claude on
+        # contributors' PATH inside this repo.
+        run: npm install -g @anthropic-ai/claude-code@2.1.317 # zizmor: ignore[adhoc-packages]
 
       - name: Validate plugin and marketplace
         run: claude plugin validate . --strict

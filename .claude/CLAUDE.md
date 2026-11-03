@@ -27,7 +27,12 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
   `~/.claude/plugins/cache/`, pinned to the installed version and commit. Edits in this
   checkout do not reach it.
 - To test edits, start a session with `claude --plugin-dir .` from the repo root.
-- `mise.toml` pins Node. CI reads the same file through `jdx/mise-action`.
+- `mise.toml` pins Node and every lint tool. CI reads the same file through
+  `jdx/mise-action`.
+- `hk.pkl` defines the checks. Run `hk install` once per clone so pre-commit runs them
+  and stages their fixes. `hk check --all` runs everything, and CI runs the same.
+- Pin every GitHub Action to a full commit SHA with its version as a comment. `pinact`
+  and `zizmor` enforce this.
 
 ## Releases
 
@@ -40,6 +45,5 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
 - `zerodahero-plan-capture` in `plugins/plan-capture/` versions on its own. Tag its
   releases `zerodahero-plan-capture--v<version>`.
 - A renamed or removed skill is a major bump.
-- Before you push, run `claude plugin validate . --strict`,
-  `claude plugin validate plugins/plan-capture --strict`, and the two scripts in
-  `scripts/`. CI runs the same checks.
+- Before you push, run `hk check --all`, `claude plugin validate . --strict`, and
+  `claude plugin validate plugins/plan-capture --strict`. CI runs the same checks.

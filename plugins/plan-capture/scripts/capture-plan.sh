@@ -12,7 +12,7 @@ cwd=$(jq -r '.cwd // empty' <<<"$payload")
 root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null) || root=$cwd
 dir="$root/.claude/plan"
 mkdir -p "$dir" || exit 0
-[ -e "$dir/.gitignore" ] || printf '*\n' > "$dir/.gitignore"
+[ -e "$dir/.gitignore" ] || printf '*\n' >"$dir/.gitignore"
 
 # Highest existing number plus one, so a deleted file never causes an overwrite.
 last=0
@@ -24,5 +24,5 @@ for f in "$dir"/[0-9][0-9][0-9].md; do
 done
 file=$(printf '%s/%03d.md' "$dir" $((last + 1)))
 
-printf '%s\n' "$plan" > "$file" && cp "$file" "$dir/current.md"
+printf '%s\n' "$plan" >"$file" && cp "$file" "$dir/current.md"
 exit 0
