@@ -7,3 +7,13 @@ pkl = "0.32.2"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
 zizmor = "1.31.1"
+
+[tasks."plugin:update"]
+description = "Refresh the installed zerodahero plugins from this checkout"
+run = [
+  'echo "Updating from $(git branch --show-current) at $(git rev-parse --short HEAD)"',
+  "claude plugin marketplace update zerodahero",
+  "claude plugin update zerodahero-skills@zerodahero",
+  "claude plugin update zerodahero-plan-capture@zerodahero",
+  "echo 'Run /reload-plugins, or restart Claude Code, to load the update.'",
+]

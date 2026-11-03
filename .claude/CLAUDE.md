@@ -27,6 +27,9 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
   `~/.claude/plugins/cache/`, pinned to the installed version and commit. Edits in this
   checkout do not reach it.
 - To test edits, start a session with `claude --plugin-dir .` from the repo root.
+- `mise run plugin:update` refreshes the installed copy from this checkout's current
+  branch. `zerodahero-skills` updates only on a version bump. `zerodahero-plan-capture`
+  is read live from `plugins/plan-capture/`, so a `/reload-plugins` picks up its edits.
 - `mise.toml` pins Node and every lint tool. CI reads the same file through
   `jdx/mise-action`.
 - `hk.pkl` defines the checks. Run `hk install` once per clone so pre-commit runs them
