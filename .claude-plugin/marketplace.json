@@ -9,9 +9,27 @@
     {
       "name": "zerodahero-skills",
       "source": "./",
-      "description": "General-purpose agent skills for code review and naming, starting with a domain-term glossary check.",
+      "description": "General-purpose agent skills for code review and naming: a branch reviewer, a second-opinion reviewer for other harnesses, and a domain-term glossary check.",
       "category": "engineering",
-      "keywords": ["skills", "code-review", "glossary", "naming", "domain-modeling"]
+      "keywords": [
+        "skills",
+        "code-review",
+        "second-opinion",
+        "glossary",
+        "naming",
+        "domain-modeling"
+      ]
+    },
+    {
+      "name": "zerodahero-plan-capture",
+      "source": "./plugins/plan-capture",
+      "description": "Copies every plan you approve into .claude/plan/ in the repo, numbered, with current.md pointing at the latest.",
+      "category": "productivity",
+      "keywords": [
+        "plan-mode",
+        "plans",
+        "hooks"
+      ]
     }
   ]
 }

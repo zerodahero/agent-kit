@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "zerodahero-skills--v*"
+
+jobs:
+  publish-opencode:
+    name: Publish the opencode plugin to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Check the tag matches the package version
+        run: |
+          tag="${GITHUB_REF_NAME#zerodahero-skills--v}"
+          version=$(node -p 'require("./package.json").version')
+          if [ "$tag" != "$version" ]; then
+            echo "error: tag is $tag but package.json is $version." >&2
+            exit 1
+          fi
+
+      - name: Check the review method copies and versions match
+        run: scripts/check-review-method.sh && scripts/check-versions.sh
+
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

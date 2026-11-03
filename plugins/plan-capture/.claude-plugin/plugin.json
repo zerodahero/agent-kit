@@ -1,0 +1,12 @@
+{
+  "name": "zerodahero-plan-capture",
+  "version": "0.1.0",
+  "description": "Copies every plan you approve into .claude/plan/ in the repo, numbered, with current.md pointing at the latest.",
+  "author": {
+    "name": "Zack Teska",
+    "url": "https://github.com/zerodahero"
+  },
+  "repository": "https://github.com/zerodahero/agent-kit",
+  "license": "MIT",
+  "keywords": ["plan-mode", "plans", "hooks"]
+}

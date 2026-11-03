@@ -8,7 +8,7 @@ on:
 
 jobs:
   validate:
-    name: Validate plugin
+    name: Validate plugins
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,8 +19,20 @@ jobs:
         with:
           node-version: 22
 
+      - name: Check the review method copies match
+        run: scripts/check-review-method.sh
+
+      - name: Check the plugin and package versions match
+        run: scripts/check-versions.sh
+
+      - name: Check the opencode plugin parses
+        run: node --check opencode/plugin.js
+
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Validate plugin and marketplace
         run: claude plugin validate . --strict
+
+      - name: Validate the plan-capture plugin
+        run: claude plugin validate plugins/plan-capture --strict
