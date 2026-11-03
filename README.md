@@ -42,8 +42,20 @@ npx skills add zerodahero/agent-kit
 
 ### opencode
 
-Requires opencode 2.2.5 or later. Add the plugin to the `plugins` array in
-`~/.config/opencode/opencode.json`:
+The opencode plugin is published to npm as
+[`opencode-zerodahero`](https://www.npmjs.com/package/opencode-zerodahero). It needs
+opencode 2.2.5 or later, and adds the `second-review` skill and the `/second-review`
+command.
+
+**1. Install the plugin.** opencode installs the package and adds it to your global
+config:
+
+```bash
+opencode plugin add opencode-zerodahero
+```
+
+Or add it to the `plugins` array yourself, in `~/.config/opencode/opencode.json` for every
+project, or in a project's `opencode.json` for that project only:
 
 ```json
 {
@@ -51,9 +63,13 @@ Requires opencode 2.2.5 or later. Add the plugin to the `plugins` array in
 }
 ```
 
-It adds the `second-review` skill and the `/second-review` command. Then install the
-`second-reviewer` agent, whose permissions let it write only its report file and run only
-read-only shell commands:
+opencode installs the latest version at startup. To pin one, write
+`"opencode-zerodahero@0.2.0"`. To update, run `opencode plugin check`, then
+`opencode plugin update`.
+
+**2. Install the `second-reviewer` agent.** Its permissions let it write only its report
+file and run only read-only shell commands. opencode plugins cannot add agents, so it is a
+separate file:
 
 ```bash
 mkdir -p ~/.config/opencode/agents
@@ -61,9 +77,9 @@ curl -fsSL -o ~/.config/opencode/agents/second-reviewer.md \
   https://raw.githubusercontent.com/zerodahero/agent-kit/main/opencode/agents/second-reviewer.md
 ```
 
-opencode plugins cannot add agents, so the agent is a separate file. Without it,
-`/second-review` runs in your current agent and the skill's instructions are the only
-guard against edits.
+For one project only, save it to `.opencode/agents/second-reviewer.md` in that project
+instead. Without the agent, `/second-review` runs in your current agent, and the skill's
+instructions are the only guard against edits.
 
 ### Plan capture (optional)
 
