@@ -52,10 +52,11 @@ export default Plugin.define({
         description,
         async execute({ sessionID, prompt }) {
           const args = (prompt?.text ?? "").trim()
-          const agents = await ctx.agent.list()
-          if (agents.some((agent) => agent.id === "second-reviewer")) {
+          // The server resolves the agent in the session's own project, so a global or a
+          // project-level second-reviewer both work. Without one, stay on the current agent.
+          try {
             await ctx.session.switchAgent({ sessionID, agent: "second-reviewer" })
-          }
+          } catch {}
           await ctx.session.prompt({
             sessionID,
             text: content.replaceAll("$ARGUMENTS", args || "(none)"),
