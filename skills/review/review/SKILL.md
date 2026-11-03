@@ -1,7 +1,7 @@
 ---
 name: review
-description: Review this branch with the code-reviewer agent, merge any second reviews, and triage the findings
-argument-hint: "[git ref | plan path | plan number]"
+description: Review this branch with the code-reviewer agent, or triage a second review of it, and sort the findings
+argument-hint: "[full] [git ref | plan path | plan number]"
 disable-model-invocation: true
 ---
 
@@ -12,8 +12,15 @@ missing, so the folder never shows up in `git status`.
 
 `<branch>` below is `git branch --show-current | tr / -`.
 
+A **second review** is a report another harness or model wrote with the `second-review`
+skill. It sits at `.claude/plan/second-review-<branch>-<reviewer>.md`. Its first line is
+`Reviewer: <reviewer>`, and its header line carries `HEAD: <sha>`. A second review is
+**triaged** once its `<reviewer>@<sha>` appears on the `Merged:` line of
+`.claude/plan/review-<branch>.md`.
+
 ## Resolve the plan
 
+Where `$ARGUMENTS` starts with the word `full`, set it aside for the mode below. The rest of
 `$ARGUMENTS` is any mix of a git ref, a plan reference, and empty. Resolve the plan in
 this order and stop at the first that hits:
 
@@ -30,44 +37,60 @@ an earlier task is then visible rather than silent.
 Whatever is left in `$ARGUMENTS` after the plan reference passes through as the diff
 base. Where nothing is left, the agent resolves the base branch itself.
 
-## Dispatch
+## Choose the mode
+
+Glob `.claude/plan/second-review-<branch>-*.md`, and set aside every second review already
+triaged. For each one left, compare its SHA with HEAD. Where they differ, the review is
+**stale** by `git rev-list --count <sha>..HEAD` commits.
+
+| Found | Mode |
+| --- | --- |
+| `full` in `$ARGUMENTS` | **Full**, merging every untriaged second review |
+| No untriaged second review | **Full** |
+| Untriaged second reviews, none stale | **Second only** |
+| An untriaged second review that is stale | Ask with `AskUserQuestion`: triage the second reviews alone, marked stale (recommended), or run a full review that merges them |
+
+Say the mode in one line, with each second review you take and whether it is current or
+stale. A second review usually arrives after the primary review's findings are fixed, so
+**Second only** never reruns the primary reviewer on code just reviewed.
+
+## Full: dispatch
 
 Run the `zerodahero-skills:code-reviewer` agent on this branch. Hand it the resolved plan
 path and the diff base.
 
-**Do not print its report.** Hold it for the `Merged:` line below, then write it verbatim
-to `.claude/plan/review-<branch>.md`.
+**Do not print its report.** Write it verbatim to `.claude/plan/review-<branch>.md`, with a
+`Merged:` line under its header. That line lists every second review this run takes as
+`<reviewer>@<sha>`, plus the entries from the old file's `Merged:` line, so nothing is
+triaged twice.
 
-The triage below is the only thing you render. Every finding appears exactly once.
+## Second only: read the earlier review
 
-## Collect second reviews
+Leave the primary reviewer idle. Read the second reviews you took, and the existing
+`.claude/plan/review-<branch>.md` when there is one: its findings are the **earlier
+review**, the one the user has been fixing since.
 
-A **second review** is a report another harness or model wrote with the `second-review`
-skill. It sits at `.claude/plan/second-review-<branch>-<reviewer>.md`. Its first line is
-`Reviewer: <reviewer>`, and its header line carries `HEAD: <sha>`.
-
-1. Glob `.claude/plan/second-review-<branch>-*.md`.
-2. Read the `Merged:` line of the existing `.claude/plan/review-<branch>.md`, if any.
-   Skip each second review whose reviewer and SHA already appear there. A reviewer that
-   re-ran on a newer commit has a new SHA and merges again.
-3. For each remaining second review, compare its SHA with HEAD. Where they differ, count
-   `git rev-list --count <sha>..HEAD`. That review is **stale**, and each of its findings
-   carries `(stale: <n> commits since)`. Locate a stale finding by its snippet rather than
-   its line number, since the lines may have moved.
-4. Add a line under the header of the report you write:
-   `Merged: <reviewer>@<sha>, <reviewer>@<sha>`. Carry over the entries from the old
-   `Merged:` line too, so a skipped review stays skipped next time.
-
-Say in one line which second reviews you merged, which you skipped as already merged, and
-which are stale. Where none exist, say nothing.
+Add each second review's `<reviewer>@<sha>` to the `Merged:` line of
+`.claude/plan/review-<branch>.md`. Where that file does not exist, create it holding only a
+`Merged:` line.
 
 ## Triage
 
-Triage the agent's findings and every merged second-review finding as one set.
+Triage every finding this run took as one set: the agent's and the second reviews' in
+**Full**, the second reviews' alone in **Second only**. The triage is the only thing you
+render, and every finding appears in it exactly once.
 
 **Remove duplicates first.** Two findings are one when they name the same site and the
 same defect. Keep the clearer wording, take the higher severity, and tag it `both`. A
 finding only one reviewer raised is tagged `primary` or with its reviewer name.
+
+**In Second only, check each finding against the earlier review.** A second-review
+finding that matches an earlier finding is a re-raise. Check the code: where it is fixed,
+the finding goes to **Skip** with `fixed since the earlier review` as its reason. Where it
+still stands, tag it `both`.
+
+A stale finding carries `(stale: <n> commits since)`. Locate it by its snippet rather
+than its line number, since the lines may have moved.
 
 Sort every finding into exactly one bucket.
 

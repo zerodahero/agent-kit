@@ -9,60 +9,66 @@ Cross-file checks: e2e locators clean, migrations present, docs anchors clean.
 
 ## Should fix (3) — 🔴 1 · 🟡 1 · 🔵 1
 
-- **S1** · 🔴 **High** · both · `src/hire/hire.controller.ts`
-  `@Roles()` with no `RolesGuard` — the endpoint fails open.
+**S1** · 🔴 **High** · both · `src/hire/hire.controller.ts`
 
-  ```ts
-  @Roles('hiringManager')
-  @Post('postings')
-  ```
+`@Roles()` with no `RolesGuard` — the endpoint fails open.
 
-- **S2** · 🟡 **Medium** · primary · `src/hire/salary.ts`
-  New behaviour with no test — nothing covers the dollars-to-cents conversion.
+```ts
+@Roles('hiringManager')
+@Post('postings')
+```
 
-  ```ts
-  export function toCents(dollars: number): number {
-  ```
+**S2** · 🟡 **Medium** · primary · `src/hire/salary.ts`
 
-- **S3** · 🔵 **Low** · primary · `src/hire/Form.tsx`, `src/hire/SalaryField.tsx`
-  Explanatory comments. CLAUDE.md "Do not comment the code".
+New behaviour with no test — nothing covers the dollars-to-cents conversion.
 
-  `src/hire/Form.tsx`
+```ts
+export function toCents(dollars: number): number {
+```
 
-  ```tsx
-  // reset the salary fields when the type changes
-  ```
+**S3** · 🔵 **Low** · primary · `src/hire/Form.tsx`, `src/hire/SalaryField.tsx`
 
-  `src/hire/SalaryField.tsx`
+Explanatory comments. CLAUDE.md "Do not comment the code".
 
-  ```tsx
-  // the API wants cents, not dollars
-  ```
+`src/hire/Form.tsx`
+
+```tsx
+// reset the salary fields when the type changes
+```
+
+`src/hire/SalaryField.tsx`
+
+```tsx
+// the API wants cents, not dollars
+```
 
 ## Could fix (2) — 🟡 1 · 🔵 1
 
-- **C1** · 🟡 **Medium** · opencode-gpt-5 · `src/hire/hire.repository.ts`
-  Unbounded `findAll()` — no limit, and the table grows per posting.
+**C1** · 🟡 **Medium** · opencode-gpt-5 · `src/hire/hire.repository.ts`
 
-  ```ts
-  return this.db.selectFrom('hire_posting').selectAll().execute();
-  ```
+Unbounded `findAll()` — no limit, and the table grows per posting.
 
-- **C2** · 🔵 **Low** · codex-o4 (stale: 2 commits since) · `src/hire/hire.service.ts`
-  `cnt` abbreviates count. Name it `count`.
+```ts
+return this.db.selectFrom('hire_posting').selectAll().execute();
+```
 
-  ```ts
-  const cnt = postings.length;
-  ```
+**C2** · 🔵 **Low** · codex-o4 (stale: 2 commits since) · `src/hire/hire.service.ts`
+
+`cnt` abbreviates count. Name it `count`.
+
+```ts
+const cnt = postings.length;
+```
 
 ## Out of scope (1) — 🟡 1
 
-- **O1** · 🟡 **Medium** · primary · `src/workers/augment.py`
-  Retry policy is default across this worker. Its own change.
+**O1** · 🟡 **Medium** · primary · `src/workers/augment.py`
 
-  ```python
-  worker = Worker(client, task_queue=TASK_QUEUE, workflows=WORKFLOWS, activities=ACTIVITIES)
-  ```
+Retry policy is default across this worker. Its own change.
+
+```python
+worker = Worker(client, task_queue=TASK_QUEUE, workflows=WORKFLOWS, activities=ACTIVITIES)
+```
 
 ## Skip (2)
 
@@ -78,18 +84,22 @@ Rules for that shape:
   so the reader knows the shape before reading.
 - **The range line** names the range, the plan, the overlay, and the full report path,
   writing `none` for a missing plan or overlay. It names the second reviews only when any
-  merged, each marked `current` or `stale`.
+  merged, each marked `current` or `stale`. In **Second only**, it opens with the mode
+  instead of the range, and the full report path is each second review's own file:
+  `Second only: opencode-gpt-5 (current) · Earlier review: .claude/plan/review-zat-hire-form.md · Report: .claude/plan/second-review-zat-hire-form-opencode-gpt-5.md`.
+- **In Second only, the source tag** is the reviewer's name, or `both` when the earlier
+  review raised the same finding and it still stands.
 - **Every finding carries an ID**: its bucket letter, then its position in that bucket.
   **S** should fix, **C** could fix, **O** out of scope, **X** skip — the third Should
   fix finding is **S3**. Numbering restarts per bucket, and a rolled-up finding takes one
   ID. Name findings by ID in the Next line and the follow-up.
 - **Every finding carries its source** after the severity: `both`, `primary`, or the
   second reviewer's name, with its stale note when it has one.
-- **Two lines per finding, then its snippet** — ID, severity, source, and path; then the
-  prose; then the snippet. Never one long wrapping line.
-- **A blank line ends every finding.** The line after a finding's closing snippet fence,
-  or after its prose when it has no snippet, is empty. The next finding's ID line starts
-  after it. Skip findings are the exception: their one-line items sit on consecutive
+- **A finding is three flush-left blocks, never a list item** — the ID line (ID,
+  severity, source, path), then the prose, then the snippet. A blank line separates each
+  block, and a blank line ends the finding. The terminal renders list items tight and
+  drops their indentation, which runs a snippet into the next finding; flush-left blocks
+  keep their spacing. Skip findings are the exception: one-line `-` items on consecutive
   lines.
 - **A snippet** is the 1–3 lines a finding is about, copied verbatim into a fenced block
   with a language tag, trimmed with `…`. Locate code by path and snippet; a path carries no
