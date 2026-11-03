@@ -13,6 +13,13 @@ This repo is the `zerodahero` marketplace. It ships one Claude Code plugin,
   `short_description` under 60 characters. Codex and skills.sh read it.
 - Skill text follows the writing-for-agents conventions.
 
+## Development
+
+- An install from the local marketplace runs from a cached copy in
+  `~/.claude/plugins/cache/`, pinned to the installed version and commit. Edits in this
+  checkout do not reach it.
+- To test edits, start a session with `claude --plugin-dir .` from the repo root.
+
 ## Releases
 
 - To release, bump `version` in `.claude-plugin/plugin.json` and tag the commit

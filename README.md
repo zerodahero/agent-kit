@@ -1,6 +1,6 @@
 # agent-kit
 
-General-purpose agent skills by Zack Teska, packaged as a Claude Code plugin.
+General-purpose agent skills, packaged as a Claude Code plugin.
 
 ## Install
 
