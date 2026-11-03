@@ -1,0 +1,59 @@
+amends "package://github.com/jdx/hk/releases/download/v2.10.0/hk@2.10.0#/Config.pkl"
+
+import "package://github.com/jdx/hk/releases/download/v2.10.0/hk@2.10.0#/Builtins.pkl"
+
+local linters = new Mapping<String, Step> {
+  // GitHub Actions
+  ["zizmor"] = Builtins.zizmor
+  ["pinact"] = Builtins.pinact
+  ["actionlint"] = Builtins.actionlint
+
+  // Shell
+  ["shellcheck"] = Builtins.shellcheck
+  ["shfmt"] = Builtins.shfmt
+
+  // Formats
+  // Parse only. The jq builtin also sorts keys, which scrambles the manifests.
+  ["json"] {
+    glob = "**/*.json"
+    batch = true
+    check = "jq empty {{files}}"
+  }
+  ["pkl-format"] = Builtins.pkl_format
+  ["mise"] = Builtins.mise
+
+  // Hygiene
+  ["merge-conflict"] = Builtins.check_merge_conflict
+  ["trailing-whitespace"] = Builtins.trailing_whitespace
+  ["newlines"] = Builtins.newlines
+  ["mixed-line-ending"] = Builtins.mixed_line_ending
+  ["symlinks"] = Builtins.check_symlinks
+  ["shebangs"] = Builtins.check_executables_have_shebangs
+  ["private-key"] = Builtins.detect_private_key
+  ["large-files"] = Builtins.check_added_large_files
+
+  // This repo's own invariants
+  ["review-method-sync"] {
+    glob = List("agents/code-reviewer.md", "skills/review/second-review/REVIEW-METHOD.md")
+    check = "scripts/check-review-method.sh"
+  }
+  ["versions-match"] {
+    glob = List(".claude-plugin/plugin.json", "package.json")
+    check = "scripts/check-versions.sh"
+  }
+}
+
+hooks {
+  ["pre-commit"] {
+    fix = true
+    stash = "git"
+    steps = linters
+  }
+  ["check"] {
+    steps = linters
+  }
+  ["fix"] {
+    fix = true
+    steps = linters
+  }
+}

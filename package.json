@@ -1,0 +1,27 @@
+{
+  "name": "opencode-zerodahero",
+  "version": "0.2.0",
+  "description": "opencode plugin for zerodahero-skills: adds the second-review skill and the /second-review command.",
+  "type": "module",
+  "files": [
+    "opencode/",
+    "skills/review/second-review/"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "code-review"
+  ],
+  "author": "Zack Teska (https://github.com/zerodahero)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zerodahero/agent-kit.git"
+  },
+  "license": "MIT",
+  "exports": {
+    ".": "./opencode/plugin.js"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.2.5"
+  }
+}

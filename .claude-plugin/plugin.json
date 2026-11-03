@@ -1,13 +1,24 @@
 {
   "name": "zerodahero-skills",
-  "version": "0.1.0",
-  "description": "General-purpose agent skills for code review and naming, starting with a domain-term glossary check.",
+  "version": "0.2.0",
+  "description": "General-purpose agent skills for code review and naming: a branch reviewer, a second-opinion reviewer for other harnesses, and a domain-term glossary check.",
   "author": {
     "name": "Zack Teska",
     "url": "https://github.com/zerodahero"
   },
   "repository": "https://github.com/zerodahero/agent-kit",
   "license": "MIT",
-  "keywords": ["skills", "code-review", "glossary", "naming", "domain-modeling"],
-  "skills": ["./skills/review/glossary"]
+  "keywords": [
+    "skills",
+    "code-review",
+    "second-opinion",
+    "glossary",
+    "naming",
+    "domain-modeling"
+  ],
+  "skills": [
+    "./skills/review/glossary",
+    "./skills/review/review",
+    "./skills/review/second-review"
+  ]
 }

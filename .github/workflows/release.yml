@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "zerodahero-skills--v*"
+
+jobs:
+  publish-opencode:
+    name: Publish the opencode plugin to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Install tools from mise.toml
+        uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+        with:
+          # A restored cache could carry tampered tools into the publish step.
+          cache: false
+
+      - name: Check the tag matches the package version
+        run: |
+          tag="${GITHUB_REF_NAME#zerodahero-skills--v}"
+          version=$(node -p 'require("./package.json").version')
+          if [ "$tag" != "$version" ]; then
+            echo "error: tag is $tag but package.json is $version." >&2
+            exit 1
+          fi
+
+      - name: Check the review method copies and versions match
+        run: scripts/check-review-method.sh && scripts/check-versions.sh
+
+      # Trusted publishing: npm authenticates this workflow through OIDC (id-token: write)
+      # and adds provenance itself. It needs npm 11.5.1 or later, which Node 24 ships.
+      - name: Publish
+        run: npm publish --access public
