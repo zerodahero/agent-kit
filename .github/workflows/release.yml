@@ -16,11 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
+      - name: Install tools from mise.toml
+        uses: jdx/mise-action@v5
 
       - name: Check the tag matches the package version
         run: |
@@ -34,7 +31,7 @@ jobs:
       - name: Check the review method copies and versions match
         run: scripts/check-review-method.sh && scripts/check-versions.sh
 
+      # Trusted publishing: npm authenticates this workflow through OIDC (id-token: write)
+      # and adds provenance itself. It needs npm 11.5.1 or later, which Node 24 ships.
       - name: Publish
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public

@@ -27,14 +27,16 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
   `~/.claude/plugins/cache/`, pinned to the installed version and commit. Edits in this
   checkout do not reach it.
 - To test edits, start a session with `claude --plugin-dir .` from the repo root.
+- `mise.toml` pins Node. CI reads the same file through `jdx/mise-action`.
 
 ## Releases
 
 - To release, bump `version` in both `.claude-plugin/plugin.json` and `package.json`, and
   tag the commit `zerodahero-skills--v<version>`. Installed users get no update until the
   version changes. `scripts/check-versions.sh` fails when the two versions differ. The
-  tag triggers `release.yml`, which publishes the opencode plugin to npm with the
-  `NPM_TOKEN` repo secret.
+  tag triggers `release.yml`, which publishes the opencode plugin to npm through npm
+  trusted publishing. There is no npm token. Renaming `release.yml` breaks publishing
+  until the trusted publisher on npmjs.com is updated to match.
 - `zerodahero-plan-capture` in `plugins/plan-capture/` versions on its own. Tag its
   releases `zerodahero-plan-capture--v<version>`.
 - A renamed or removed skill is a major bump.

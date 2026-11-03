@@ -14,10 +14,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - name: Install tools from mise.toml
+        uses: jdx/mise-action@v5
 
       - name: Check the review method copies match
         run: scripts/check-review-method.sh
