@@ -116,6 +116,38 @@ primary review:
 
 A second review merges once per commit, so running `/review` again does not repeat it.
 
+## Project overlay
+
+Both reviewers follow one generic method. To teach them a repo's specifics, add
+`docs/agents/code-review.md` to that repo. It lists only what differs, under the method's
+section names, and it wins where it conflicts with the method. Every harness reads it, so
+`/second-review` in opencode gets the same specifics.
+
+```markdown
+# Code review overlay
+
+## Scope
+
+Base ref: `refs/heads/dev`.
+
+## Standards
+
+`CODING_STANDARDS.md` binds all code. Biome and `tsc` own what they catch.
+
+## Lenses
+
+- **Authorization:** `@Roles()` is inert without `@UseGuards(RolesGuard)`.
+- **Workflow determinism** (extra lens): no clocks, randomness, or I/O in a Temporal
+  workflow's `run()`.
+
+## Blast radius
+
+| The diff changes | Grep the old string in |
+| --- | --- |
+| copy, a heading, an ARIA role, a test id | `smoke-tests/tests/` |
+| a table or column | `database/alembic/versions/` |
+```
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

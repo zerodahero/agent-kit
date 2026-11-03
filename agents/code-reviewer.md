@@ -20,7 +20,13 @@ On the base branch itself, review the uncommitted work only.
 Read the tests the diff adds or changes. Running tests, linters, and builds belongs to
 the caller, so you work from the code alone.
 
-## 2. Read the standards
+## 2. Read the overlay and the standards
+
+The **overlay** is `docs/agents/code-review.md`, when the repo has one. It holds this
+repo's specifics for the method below, under the same section names: an exact base ref,
+the standards files, details on existing lenses, extra lenses, and the real paths for
+the blast-radius rows. Read it first. Apply each entry to the section it names. Where an
+entry conflicts with this method, the overlay wins. Name it in the header line.
 
 Read whichever of these the repo has: `CLAUDE.md`, `CODING_STANDARDS.md`,
 `CONTRIBUTING.md`, `AGENTS.md`, `docs/agents/`. A nested `CLAUDE.md` under a changed
@@ -106,8 +112,9 @@ Structure the report in this order.
 `**No High findings. Two Low, both in the hire form.**`
 
 **The header line**, second, in this exact shape so a later merge can parse it:
-`Range: main...HEAD · HEAD: 1a2b3c4 · Plan: .claude/plan/004.md`. `HEAD` is
-`git rev-parse --short HEAD`. `Plan` is the path you were handed, or `none`.
+`Range: main...HEAD · HEAD: 1a2b3c4 · Plan: .claude/plan/004.md · Overlay: docs/agents/code-review.md`.
+`HEAD` is `git rev-parse --short HEAD`. `Plan` is the path you were handed, and
+`Overlay` is the overlay path. Each is `none` when absent.
 
 **Cross-file checks** — one line naming the greps you ran and what they turned up. Call
 that line **Cross-file checks**, not blast radius.
@@ -132,17 +139,31 @@ even though the file holding it is untouched.
 | 🟡 | Medium | A citable rule broken where the code still behaves correctly, or a correctness risk under a narrow condition |
 | 🔵 | Low | Judgement, naming, a suggestion |
 
-Every finding is its own `-` bullet on its own line, in this shape:
+A **snippet** is the 1–3 lines a finding is about, copied verbatim into a fenced block
+with a language tag, trimmed with `…`. Locate code by path and snippet; a path carries no
+line number, because lines move and a snippet still matches. A finding about something
+missing quotes the changed lines that need it: the column the migration should add, the
+function the test should cover. A systemic finding with no single site takes no snippet.
 
-```
-- 🔴 **High** · changed-line · path:line — what breaks — the rule or grep that shows it
-```
+Every finding is its own `-` bullet: one line, then its snippet indented under it, in
+this shape:
 
-Keep each finding to that one line. Put a blank line between sections.
+````
+- 🔴 **High** · changed-line · path — what breaks — the rule or grep that shows it
+
+  ```ts
+  @Roles('hiringManager')
+  @Post('postings')
+  ```
+````
+
+Keep each finding to that one line plus its snippet. Put a blank line after every
+finding and between sections.
 
 **Roll up a repeated rule.** The same rule broken in several places is one finding
-carrying several locations, not one finding per location: `path:18, 31, 55` for one
-file, `path-a:18, path-b:40` across files. You hold the full set, so only you can do
+carrying several locations, not one finding per location, with one snippet per
+location. The finding line lists every path. Where the paths differ, put each
+snippet's path on its own line above it. You hold the full set, so only you can do
 this.
 
 **A count per section.**

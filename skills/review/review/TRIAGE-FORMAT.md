@@ -3,7 +3,7 @@
 ````markdown
 **3 should fix, 2 could fix, 1 out of scope, 2 skipped.** 🔴 1 · 🟡 3 · 🔵 2
 
-Range: `main...HEAD` · Plan: `.claude/plan/004.md` · Second reviews: opencode-gpt-5 (current), codex-o4 (stale) · Full report: `.claude/plan/review-zat-hire-form.md`
+Range: `main...HEAD` · Plan: `.claude/plan/004.md` · Overlay: `docs/agents/code-review.md` · Second reviews: opencode-gpt-5 (current), codex-o4 (stale) · Full report: `.claude/plan/review-zat-hire-form.md`
 
 Cross-file checks: e2e locators clean, migrations present, docs anchors clean.
 
@@ -76,8 +76,9 @@ Rules for that shape:
 
 - **Counts lead.** The verdict line carries the bucket counts and the severity totals,
   so the reader knows the shape before reading.
-- **The range line** names the range, the plan, and the full report path. It names the
-  second reviews only when any merged, each marked `current` or `stale`.
+- **The range line** names the range, the plan, the overlay, and the full report path,
+  writing `none` for a missing plan or overlay. It names the second reviews only when any
+  merged, each marked `current` or `stale`.
 - **Every finding carries an ID**: its bucket letter, then its position in that bucket.
   **S** should fix, **C** could fix, **O** out of scope, **X** skip — the third Should
   fix finding is **S3**. Numbering restarts per bucket, and a rolled-up finding takes one
