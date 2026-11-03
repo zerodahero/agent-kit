@@ -39,8 +39,10 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
 
 ## Releases
 
-- To release, bump `version` in both `.claude-plugin/plugin.json` and `package.json`, and
-  tag the commit `zerodahero-skills--v<version>`. Installed users get no update until the
+- To release, merge a PR that bumps `version` in both `.claude-plugin/plugin.json` and
+  `package.json`, then run `mise run release <version>` on an up-to-date `main`. It
+  refuses a version that is already tagged or already on npm, then pushes the tag
+  `zerodahero-skills--v<version>`. Installed users get no update until the
   version changes. `scripts/check-versions.sh` fails when the two versions differ. The
   tag triggers `release.yml`, which publishes the opencode plugin to npm through npm
   trusted publishing. There is no npm token. Renaming `release.yml` breaks publishing

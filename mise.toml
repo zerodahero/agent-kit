@@ -17,3 +17,8 @@ run = [
   "claude plugin update zerodahero-plan-capture@zerodahero",
   "echo 'Run /reload-plugins, or restart Claude Code, to load the update.'",
 ]
+
+[tasks.release]
+description = "Tag and push a zerodahero-skills release after checking the version is new"
+usage = 'arg "<version>" help="The version to release, such as 0.2.2"'
+run = 'scripts/release.sh "${usage_version}"'
