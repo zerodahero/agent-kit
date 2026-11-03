@@ -86,6 +86,10 @@ Rules for that shape:
   second reviewer's name, with its stale note when it has one.
 - **Two lines per finding, then its snippet** — ID, severity, source, and path; then the
   prose; then the snippet. Never one long wrapping line.
+- **A blank line ends every finding.** The line after a finding's closing snippet fence,
+  or after its prose when it has no snippet, is empty. The next finding's ID line starts
+  after it. Skip findings are the exception: their one-line items sit on consecutive
+  lines.
 - **A snippet** is the 1–3 lines a finding is about, copied verbatim into a fenced block
   with a language tag, trimmed with `…`. Locate code by path and snippet; a path carries no
   line number. A finding about something missing quotes the changed lines that need it; a
