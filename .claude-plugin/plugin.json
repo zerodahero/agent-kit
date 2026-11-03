@@ -1,0 +1,13 @@
+{
+  "name": "zerodahero-skills",
+  "version": "0.1.0",
+  "description": "General-purpose agent skills for code review and naming, starting with a domain-term glossary check.",
+  "author": {
+    "name": "Zack Teska",
+    "url": "https://github.com/zerodahero"
+  },
+  "repository": "https://github.com/zerodahero/agent-kit",
+  "license": "MIT",
+  "keywords": ["skills", "code-review", "glossary", "naming", "domain-modeling"],
+  "skills": ["./skills/review/glossary"]
+}

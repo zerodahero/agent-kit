@@ -1,0 +1,17 @@
+{
+  "name": "zerodahero",
+  "owner": {
+    "name": "Zack Teska",
+    "url": "https://github.com/zerodahero"
+  },
+  "description": "Zack Teska's general-purpose agent skills, as an installable Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "zerodahero-skills",
+      "source": "./",
+      "description": "General-purpose agent skills for code review and naming, starting with a domain-term glossary check.",
+      "category": "engineering",
+      "keywords": ["skills", "code-review", "glossary", "naming", "domain-modeling"]
+    }
+  ]
+}
