@@ -97,6 +97,7 @@ without a path. The folder ignores itself, so it never shows up in `git status`.
 | --- | --- |
 | `glossary` | Checks the domain terms a branch introduces against the codebase and the glossary, asks you to confirm each word, then renames and records them. |
 | `human-review` | Prepares a layered review that you walk yourself: short purpose, design, flow, and test-name docs, then the full diff in tuicr. It writes a [korin](https://github.com/zerodahero/korin) wizard pinned to one range, so every run shows the same thing. |
+| `plan-review` | Red-teams a plan in plan mode with an opencode reviewer over several rounds, and records every finding in a ledger at the end of the plan. You see only the decisions that need you. |
 | `review` | Reviews the branch with the `code-reviewer` agent, merges any second reviews, and triages every finding into should fix, could fix, out of scope, and skip. |
 | `second-review` | An independent review from another harness or model. It writes its findings to a file for `/review` to merge. It edits nothing else and runs no tests. |
 
@@ -150,7 +151,7 @@ script's full path, and the rule matches only the installed plugin's copy:
 
 The two-session flow above still works.
 
-## Plan review (draft)
+## Plan review
 
 `plan-review` red-teams a plan in Claude Code's plan mode before you read it. Claude
 drafts a locked **anchor** of what scoping agreed, and you approve it. Claude then writes
@@ -160,15 +161,10 @@ decides to accept, rebut, or defer it. Disputes and shifts away from the anchor 
 you as questions. The plan reaches Plannotator with its revision notes and
 ledger already in place.
 
-It is a draft, so the plugin does not ship it. To use it:
+Claude offers it when a plan settles architecture, a data model, an external contract, or
+a scope boundary. Run `/plan-review` in plan mode to start it yourself. To set it up:
 
-1. **Link the skill.** From this checkout:
-
-   ```bash
-   ln -s "$PWD/skills/drafts/plan-review" ~/.claude/skills/plan-review
-   ```
-
-2. **Install the `plan-reviewer` agent.** It denies every tool except reading the repo,
+1. **Install the `plan-reviewer` agent.** It denies every tool except reading the repo,
    read-only `git` and search commands, and writing its own report:
 
    ```bash
@@ -177,24 +173,25 @@ It is a draft, so the plugin does not ship it. To use it:
      https://raw.githubusercontent.com/zerodahero/agent-kit/main/opencode/agents/plan-reviewer.md
    ```
 
-3. **Let the scripts run unprompted.** Claude runs `run-round.sh` and `ledger.py` with
+2. **Let the scripts run unprompted.** Claude runs `run-round.sh` and `ledger.py` with
    the sandbox disabled: opencode writes its log outside the sandbox, and the plan file
    sits outside it too. A `sandbox.excludedCommands` entry does not match these commands,
    because their instructions arrive in a multi-line heredoc. Add the allow rules to
-   `~/.claude/settings.json`, so each call skips the prompt:
+   `~/.claude/settings.json`, with your home directory in place of `/Users/you`, so each
+   call skips the prompt:
 
    ```json
    {
      "permissions": {
        "allow": [
-         "Bash(~/.claude/skills/plan-review/run-round.sh *)",
-         "Bash(~/.claude/skills/plan-review/ledger.py *)"
+         "Bash(/Users/you/.claude/plugins/cache/zerodahero/zerodahero-skills/*/skills/review/plan-review/run-round.sh *)",
+         "Bash(/Users/you/.claude/plugins/cache/zerodahero/zerodahero-skills/*/skills/review/plan-review/ledger.py *)"
        ]
      }
    }
    ```
 
-4. **Pick a model.** Pass one as `/plan-review openai/gpt-6.2-sol`, or set `model` in
+3. **Pick a model.** Pass one as `/plan-review openai/gpt-6.2-sol`, or set `model` in
    your opencode config. opencode's free default model runs out of quota quickly.
 
 The scripts need `opencode` 2.4 or later, `jq`, and Python 3. Each round writes its
@@ -213,8 +210,8 @@ With `zerodahero-plan-capture` installed, `ExitPlanMode` writes `.claude/plan/cu
 before you approve the plan, so `/review` can pick up a draft you rejected. `plan-review`
 copies the approved plan there again once you approve it.
 
-After you build the plan, review the code with `/second-review` in a fresh opencode
-session. The plan reviewer approved the plan, so it reads code that matches the plan too
+After you build the plan, review the code with `/review second`, or with `/second-review`
+in a fresh opencode session. The plan reviewer approved the plan, so it reads code that matches the plan too
 kindly.
 
 ## Project overlay
