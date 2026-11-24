@@ -44,13 +44,15 @@ Explanatory comments. CLAUDE.md "Do not comment the code".
 
 ## Could fix (2) — 🟡 1 · 🔵 1
 
-**C1** · 🟡 **Medium** · opencode-gpt-5 · `src/hire/hire.repository.ts`
+**C1** · 🟡 **Medium** (was High: an admin-only page, and postings stay in the hundreds) · opencode-gpt-5 · `src/hire/hire.repository.ts`
 
 Unbounded `findAll()` — no limit, and the table grows per posting.
 
 ```ts
 return this.db.selectFrom('hire_posting').selectAll().execute();
 ```
+
+Rejected part: "runs on every page load" — the controller caches it for five minutes.
 
 **C2** · 🔵 **Low** · codex-o4 (stale: 2 commits since) · `src/hire/hire.service.ts`
 
@@ -84,7 +86,8 @@ Rules for that shape:
   so the reader knows the shape before reading.
 - **The range line** names the range, the plan, the overlay, and the full report path,
   writing `none` for a missing plan or overlay. It names the second reviews only when any
-  merged, each marked `current` or `stale`. In **Second only**, it opens with the mode
+  merged, each marked `current` or `stale`, or `this run` for the one **Full with second**
+  started. Where that one failed, the range line names it as `<reviewer> (failed)`. In **Second only**, it opens with the mode
   instead of the range, and the full report path is each second review's own file:
   `Second only: opencode-gpt-5 (current) · Earlier review: .claude/plan/review-zat-hire-form.md · Report: .claude/plan/second-review-zat-hire-form-opencode-gpt-5.md`.
 - **In Second only, the source tag** is the reviewer's name, or `both` when the earlier
@@ -109,6 +112,16 @@ Rules for that shape:
   where the paths differ, each snippet's path sits on its own line above it.
 - **Severity is 🔴 High, 🟡 Medium, 🔵 Low**, carried over from the reviewers. Each bucket
   heading ends in its own severity mix, omitting any severity it has none of.
+- **A changed severity** carries the reviewer's severity and your reason after it, on the
+  ID line: `🟡 **Medium** (was High: <reason>)`. Change it only when you judge the impact
+  differently. Counts and headings use the new severity.
+- **A partly valid finding** states only its valid part in the prose. A fourth block,
+  after the snippet, names what you rejected: `Rejected part: <the claim> — <why it is
+  wrong>`.
+- **The index.** When more than 8 findings sit outside Skip, put an index between the
+  cross-file checks line and the first bucket: one `-` line per finding, in bucket
+  order, on consecutive lines, as `- **S1** · 🔴 · both · <the finding's first sentence>`.
+  Skip stays out of the index.
 - **Skip is one line each**, reason in a clause, under a heading carrying the count.
   Skip takes no severity dots — an invalid finding has no meaningful severity — and no
   snippet; its reason names code by symbol or test name.

@@ -28,3 +28,7 @@ permission:
 ---
 
 You are a second reviewer. Follow the second-review instructions exactly.
+
+Read files with the read tool, and search with the grep and glob tools. Your shell runs
+only the commands this agent allows, one command per call. A chain of commands joined by
+`;`, `&&`, `||` or a pipe is denied, and so is a loop.

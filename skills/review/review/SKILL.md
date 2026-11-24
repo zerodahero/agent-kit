@@ -1,7 +1,7 @@
 ---
 name: review
-description: Review this branch with the code-reviewer agent, or triage a second review of it, and sort the findings
-argument-hint: "[full] [git ref | plan path | plan number]"
+description: Review this branch with the code-reviewer agent, optionally alongside an opencode second review, or triage a second review of it, and sort the findings
+argument-hint: "[full | second [provider/model]] [git ref | plan path | plan number]"
 disable-model-invocation: true
 ---
 
@@ -20,8 +20,12 @@ skill. It sits at `.claude/plan/second-review-<branch>-<reviewer>.md`. Its first
 
 ## Resolve the plan
 
-Where `$ARGUMENTS` starts with the word `full`, set it aside for the mode below. The rest of
-`$ARGUMENTS` is any mix of a git ref, a plan reference, and empty. Resolve the plan in
+Where `$ARGUMENTS` starts with the word `full`, set it aside for the mode below. Where it
+starts with `second`, set that aside too, along with the token after it when that token
+holds a `/`, names no existing path, and is no git ref (`git rev-parse --verify --quiet
+<token>` prints nothing): that token is the **second model**, a `provider/model` for
+opencode. The rest of `$ARGUMENTS` is any mix of a git ref, a plan
+reference, and empty. Resolve the plan in
 this order and stop at the first that hits:
 
 1. `$ARGUMENTS` names a path that exists. That is the plan.
@@ -45,6 +49,7 @@ triaged. For each one left, compare its SHA with HEAD. Where they differ, the re
 
 | Found | Mode |
 | --- | --- |
+| `second` in `$ARGUMENTS` | **Full with second**, merging every untriaged second review as well |
 | `full` in `$ARGUMENTS` | **Full**, merging every untriaged second review |
 | No untriaged second review | **Full** |
 | Untriaged second reviews, none stale | **Second only** |
@@ -56,13 +61,51 @@ stale. A second review usually arrives after the primary review's findings are f
 
 ## Full: dispatch
 
-Run the `zerodahero-skills:code-reviewer` agent on this branch. Hand it the resolved plan
-path and the diff base.
+Where `.claude/plan/review-<branch>.md` exists, note its `Merged:` line first: the agent
+overwrites the file.
 
-**Do not print its report.** Write it verbatim to `.claude/plan/review-<branch>.md`, with a
-`Merged:` line under its header. That line lists every second review this run takes as
-`<reviewer>@<sha>`, plus the entries from the old file's `Merged:` line, so nothing is
-triaged twice.
+Run the `zerodahero-skills:code-reviewer` agent on this branch. Hand it the resolved plan
+path, the diff base, and the **report path** `.claude/plan/review-<branch>.md`. Tell it to
+write its report to the report path with the Write tool, and to reply with only the
+path, its verdict line, and its finding count per severity.
+
+**The report stays in its file.** Read it from there to triage, and never print or
+rewrite it. Add one line under its header line, with one edit: `Merged:`, listing every
+second review this run takes as `<reviewer>@<sha>`, plus the entries from the old
+`Merged:` line, so nothing is triaged twice. Where the agent wrote no report, say so and
+stop.
+
+## Full with second: dispatch both
+
+Run the primary and the second reviewer at the same time, and triage once, after both
+finish.
+
+1. Start the `zerodahero-skills:code-reviewer` agent in the background, with the plan
+   path and the diff base, as in **Full**.
+2. Start the second review in the background with `run_in_background`, from the repo
+   root, with the sandbox disabled:
+
+   ```bash
+   ${CLAUDE_SKILL_DIR}/run-second.sh <reviewer> [--model <second model>] [--base <base>] [--plan <plan>]
+   ```
+
+   The **reviewer** is `opencode-<model>`, where `<model>` is the part of the second
+   model after its last `/`, or `opencode` without a second model. Pass each flag only
+   when you have its value.
+3. Say in one line that both reviewers are running. Wait for both completion
+   notifications. The second review usually finishes last.
+
+Read the script's output:
+
+| Exit | Do |
+| --- | --- |
+| 0 | Take the report at `report:` as a second review of this run. |
+| 3 | Take the report. List the `denied` lines in one line under the triage's verdict line. |
+| 1 | Triage the primary findings alone. The verdict line says the second review failed, with the reason from the `result:` line. |
+| 2 | As for 1, with the reason from the `error:` line. |
+
+Then continue as in **Full**: add the `Merged:` line to the primary report, with this
+run's second review on it, and triage the whole set.
 
 ## Second only: read the earlier review
 
@@ -116,6 +159,10 @@ Within a bucket, `both` findings sort first.
 
 A second reviewer had none of this session's context. Check each of its findings against
 the code before you bucket it.
+
+A finding that bundles valid and wrong claims keeps its valid part in a bucket and
+records the wrong part, as TRIAGE-FORMAT.md shows. Where you judge a finding's impact
+differently from its reviewer, change its severity and give the reason.
 
 **The Skip guard.** Move a finding to **Skip** only because it is *wrong*. A coding
 standards, comment, or repo hygiene finding on `changed-line` or `changed-file` never
