@@ -81,7 +81,7 @@ title. From here on, the anchor changes only by the user's hand.
 Write the plan below the anchor. Then add the empty ledger:
 
 ```bash
-~/.claude/skills/plan-review/ledger.py init <plan path>
+${CLAUDE_SKILL_DIR}/ledger.py init <plan path>
 ```
 
 ## 4. Run a round
@@ -93,7 +93,7 @@ Run one attempt at a time, in the background with `run_in_background`, from the 
 root, with the round's instructions on stdin:
 
 ```bash
-~/.claude/skills/plan-review/run-round.sh <slug> <N> <plan path> [provider/model] <<'EOF'
+${CLAUDE_SKILL_DIR}/run-round.sh <slug> <N> <plan path> [provider/model] <<'EOF'
 <instructions>
 EOF
 ```
@@ -146,7 +146,7 @@ and run round `N` again.
 Read the report. Then merge it into the ledger:
 
 ```bash
-~/.claude/skills/plan-review/ledger.py apply <plan path> <report path> <session>
+${CLAUDE_SKILL_DIR}/ledger.py apply <plan path> <report path> <session>
 ```
 
 It gives each new key the next ledger ID, applies the reviewer's dispositions by the
@@ -160,7 +160,7 @@ Keep the key map for the next round.
    when you now see it differently. Write all decisions in one call:
 
    ```bash
-   ~/.claude/skills/plan-review/ledger.py set <plan path> <<'EOF'
+   ${CLAUDE_SKILL_DIR}/ledger.py set <plan path> <<'EOF'
    L-14 | decision | accept — move the backfill into the workflow
    L-15 | decision | rebut — A2 locks only `benefit`
    EOF

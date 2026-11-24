@@ -1,7 +1,7 @@
 {
   "name": "zerodahero-skills",
-  "version": "0.4.0",
-  "description": "General-purpose agent skills for code review and naming: a branch reviewer, a second-opinion reviewer for other harnesses, a layered review for humans, and a domain-term glossary check.",
+  "version": "0.5.0",
+  "description": "General-purpose agent skills for planning, code review and naming: a plan red-team, a branch reviewer, a second-opinion reviewer for other harnesses, a layered review for humans, and a domain-term glossary check.",
   "author": {
     "name": "Zack Teska",
     "url": "https://github.com/zerodahero"
@@ -10,6 +10,7 @@
   "license": "MIT",
   "keywords": [
     "skills",
+    "plan-review",
     "code-review",
     "second-opinion",
     "human-review",
@@ -21,6 +22,7 @@
   "skills": [
     "./skills/review/glossary",
     "./skills/review/human-review",
+    "./skills/review/plan-review",
     "./skills/review/review",
     "./skills/review/second-review"
   ]
