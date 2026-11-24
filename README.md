@@ -96,8 +96,18 @@ without a path. The folder ignores itself, so it never shows up in `git status`.
 | Skill | What it does |
 | --- | --- |
 | `glossary` | Checks the domain terms a branch introduces against the codebase and the glossary, asks you to confirm each word, then renames and records them. |
+| `human-review` | Prepares a layered review that you walk yourself: short purpose, design, flow, and test-name docs, then the full diff in tuicr. It writes a [korin](https://github.com/zerodahero/korin) wizard pinned to one range, so every run shows the same thing. |
 | `review` | Reviews the branch with the `code-reviewer` agent, merges any second reviews, and triages every finding into should fix, could fix, out of scope, and skip. |
 | `second-review` | An independent review from another harness or model. It writes its findings to a file for `/review` to merge. It edits nothing else and runs no tests. |
+
+`human-review` needs `korin` 0.1.2 or later, `tuicr`, and either Plannotator or `nvim` on
+the `PATH` when you run the wizard. Run it from the repo root with `korin run
+.reviews/<id>/<range>/review.korin`. The wizard is a korin guide: it pauses before each
+stage instead of asking for approval. Each layer doc opens in Plannotator, and your
+annotations become your notes. Without Plannotator, it opens in nvim beside a notes pane;
+set `HUMAN_REVIEW_PREVIEW` to an nvim command, such as `MdKite start`, for a live preview
+there. korin keeps its run journal in `.korin/` at the repo root, so add that directory to
+a gitignore.
 
 `glossary` uses [Plannotator](https://github.com/backnotprop/plannotator) for the review
 step when it is installed. Without it, the skill asks through Claude Code's question

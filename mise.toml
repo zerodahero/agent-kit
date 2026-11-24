@@ -1,5 +1,6 @@
 [tools]
 actionlint = "1.7.12"
+"github:zerodahero/korin" = "0.1.2"
 hk = { version = "2.10.0", workflow = "release.yml" }
 node = "24"
 pinact = "5.0.2"

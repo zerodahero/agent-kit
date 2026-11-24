@@ -1,0 +1,12 @@
+# One layer: the doc and its notes, in Plannotator when it is installed, else in nvim
+# beside a notes pane. Then findings.md is refreshed, so a stop before the next stage keeps
+# them. Both scripts write only inside the run directory, so they are read steps.
+define layer(dir, repo, base, head, preview, title, file)
+  read which plannotator
+    expect no_plannotator = exit 1
+  when no_plannotator
+    interactive nvim -O {dir}/{file}.md {dir}/notes/{file}.md -c "1wincmd w" -c "setlocal readonly nomodifiable" -c {preview} -c "2wincmd w"
+  when not no_plannotator
+    script read ./annotate-layer.sh {dir}/{file}.md {dir}/notes/{file}.md {title}
+      timeout 24h
+  script read ./collect-findings.sh {dir} {repo} {base} {head} {title}

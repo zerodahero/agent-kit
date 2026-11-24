@@ -37,6 +37,14 @@ local linters = new Mapping<String, Step> {
     glob = List("agents/code-reviewer.md", "skills/review/second-review/REVIEW-METHOD.md")
     check = "scripts/check-review-method.sh"
   }
+  // korin check takes one file per call, and only wizards: a module is checked through
+  // the wizard that uses it.
+  ["korin"] {
+    glob = "**/*.korin"
+    check =
+      "for f in {{files}}; do head -1 \"$f\" | grep -q '^korin 1' || continue; korin check \"$f\" || exit 1; done && korin fmt --check {{files}}"
+    fix = "korin fmt {{files}}"
+  }
   ["versions-match"] {
     glob = List(".claude-plugin/plugin.json", "package.json")
     check = "scripts/check-versions.sh"

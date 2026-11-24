@@ -1,0 +1,57 @@
+korin 1
+title "Human review"
+# A guide: no gates. It pauses before each stage, and Enter runs it. Ctrl-C stops the
+# review; findings.md keeps every layer finished so far.
+mode guide
+allow git, which, nvim, tuicr, ./collect-findings.sh, ./annotate-layer.sh
+
+param repo required
+param dir required
+param base required
+param head required
+# Without Plannotator, docs open in nvim. This nvim command runs in the doc pane, such as
+# "MdKite start" for a live preview. "echo" does nothing.
+param preview = "echo"
+
+use "./layer.korin" as review
+
+stage "0. Preflight"
+  # Commands run from the person's working directory, and tuicr reads the repo from it.
+  read git rev-parse --show-toplevel
+    capture top = text
+  assert top == repo else "Run this from {repo}."
+  # --show-toplevel answers the root even from a subdirectory; the prefix is empty only at the root.
+  read git rev-parse --show-prefix
+    capture prefix = text
+  assert prefix == "" else "Run this from {repo}, not from its subdirectory {prefix}."
+  read git rev-parse HEAD
+    capture now = text
+  when now != head
+    read git log --oneline {head}..HEAD
+    warn "The branch moved after generation. The docs and tuicr cover {base}..{head} only."
+
+stage "1. Purpose"
+  note "What is this change for? Annotate the doc, or approve it with no notes."
+  review.layer({dir}, {repo}, {base}, {head}, {preview}, "1. Purpose", "01-purpose")
+
+stage "2. Design"
+  note "How is it built, and where does each file fit?"
+  review.layer({dir}, {repo}, {base}, {head}, {preview}, "2. Design", "02-design")
+
+stage "3. Flow"
+  note "What path does it take at run time, and where does that path jump?"
+  review.layer({dir}, {repo}, {base}, {head}, {preview}, "3. Flow", "03-flow")
+
+stage "4. Tests"
+  note "What behavior does it promise? Test names only; the code comes next. To flag a test for a closer look, comment on its name."
+  review.layer({dir}, {repo}, {base}, {head}, {preview}, "4. Tests", "04-tests")
+
+stage "5. Code review"
+  # REVIEW NOTE: generation replaces this note with the file count and where to start.
+  note "The full diff in tuicr. Comment on lines as you go; the comments land in findings.md."
+  interactive tuicr -r {base}..{head}
+  script read ./collect-findings.sh {dir} {repo} {base} {head} "5. Code review"
+
+stage "6. Findings"
+  script read ./collect-findings.sh {dir} {repo} {base} {head} complete
+  record "findings written to {dir}/findings.md"
