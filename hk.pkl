@@ -12,6 +12,12 @@ local linters = new Mapping<String, Step> {
   ["shellcheck"] = Builtins.shellcheck
   ["shfmt"] = Builtins.shfmt
 
+  // Python
+  ["ruff"] = Builtins.ruff
+  ["ruff-format"] = (Builtins.ruff_format) {
+    depends = "ruff"
+  }
+
   // Formats
   // Parse only. The jq builtin also sorts keys, which scrambles the manifests.
   ["json"] {
@@ -19,6 +25,7 @@ local linters = new Mapping<String, Step> {
     batch = true
     check = "jq empty {{files}}"
   }
+  ["rumdl"] = Builtins.rumdl
   ["pkl-format"] = Builtins.pkl_format
   ["mise"] = Builtins.mise
 

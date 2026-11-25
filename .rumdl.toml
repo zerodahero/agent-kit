@@ -1,0 +1,11 @@
+# Starts from the maintainer's global rumdl config.
+[global]
+editorconfig = true
+# Prose wraps near 90 by habit, but frontmatter descriptions, URLs and some files run
+# long, and reflowing would churn skill text.
+# Skills and agents open with frontmatter and an instruction, not a heading.
+disable = ["MD013", "MD041"]
+
+[MD060]
+enabled = true
+style = "aligned"

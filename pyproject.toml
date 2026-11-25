@@ -1,0 +1,21 @@
+# Dev tooling for the Python scripts in skills/. Nothing here is a package.
+[project]
+name = "agent-kit"
+version = "0.0.0"
+requires-python = ">=3.13"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
