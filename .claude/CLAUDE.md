@@ -14,6 +14,8 @@ repo an opencode v2 plugin, published to npm as `opencode-zerodahero`.
 - Every skill directory has `agents/openai.yaml` with `interface.display_name` and a
   `short_description` under 60 characters. Codex and skills.sh read it.
 - Skill text follows the writing-for-agents conventions.
+- Output styles live in `output-styles/<name>.md`. The plugin ships every file there
+  through the default scan, so `plugin.json` has no `outputStyles` key.
 - `agents/code-reviewer.md` and `skills/review/second-review/REVIEW-METHOD.md` share one
   body. Edit both. `scripts/check-review-method.sh` checks them, and CI runs it.
 - `opencode/plugin.js` builds the opencode `second-review` skill and `/second-review`
