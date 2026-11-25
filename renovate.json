@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits",
+    "schedule:weekly"
+  ],
+  "customManagers": [
+    {
+      "description": "The Claude Code version CI installs to validate the plugins",
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/validate\\.yml$/"],
+      "matchStrings": ["@anthropic-ai/claude-code@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "@anthropic-ai/claude-code",
+      "datasourceTemplate": "npm"
+    },
+    {
+      "description": "The hk version in the hk.pkl package URLs, which must match mise.toml",
+      "customType": "regex",
+      "managerFilePatterns": ["/^hk\\.pkl$/"],
+      "matchStrings": [
+        "download/v(?<currentValue>\\d+\\.\\d+\\.\\d+)/",
+        "/hk@(?<currentValue>\\d+\\.\\d+\\.\\d+)#"
+      ],
+      "depNameTemplate": "hk",
+      "packageNameTemplate": "jdx/hk",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "hk.pkl and mise.toml name one hk version, so they move together",
+      "matchDepNames": ["hk", "jdx/hk", "aqua:jdx/hk"],
+      "groupName": "hk"
+    }
+  ]
+}
