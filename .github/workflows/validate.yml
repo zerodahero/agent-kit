@@ -28,9 +28,6 @@ jobs:
           # pinact verifies pinned SHAs against the GitHub API.
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Check the opencode plugin parses
-        run: node --check opencode/plugin.js
-
       - name: Install Claude Code
         # Installed here rather than in mise.toml, which would shadow the claude on
         # contributors' PATH inside this repo.

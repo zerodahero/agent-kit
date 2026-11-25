@@ -55,6 +55,10 @@ local linters = new Mapping<String, Step> {
       "for f in {{files}}; do head -1 \"$f\" | grep -q '^korin 1' || continue; korin check \"$f\" || exit 1; done && korin fmt --check {{files}}"
     fix = "korin fmt {{files}}"
   }
+  ["opencode-plugin"] {
+    glob = List("opencode/**", "skills/review/second-review/**", "tests/opencode/**")
+    check = "node --check opencode/plugin.js && node --test 'tests/opencode/*.test.js'"
+  }
   ["pytest"] {
     glob = List("skills/review/plan-review/*.py", "tests/**/*.py", "pyproject.toml", "uv.lock")
     check = "uv run --frozen pytest -q"
