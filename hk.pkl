@@ -25,7 +25,10 @@ local linters = new Mapping<String, Step> {
     batch = true
     check = "jq empty {{files}}"
   }
-  ["rumdl"] = Builtins.rumdl
+  // Test fixtures copy formats that other tools write, so they stay as written.
+  ["rumdl"] = (Builtins.rumdl) {
+    exclude = "tests/**/fixtures/**"
+  }
   ["pkl-format"] = Builtins.pkl_format
   ["mise"] = Builtins.mise
 
@@ -51,6 +54,10 @@ local linters = new Mapping<String, Step> {
     check =
       "for f in {{files}}; do head -1 \"$f\" | grep -q '^korin 1' || continue; korin check \"$f\" || exit 1; done && korin fmt --check {{files}}"
     fix = "korin fmt {{files}}"
+  }
+  ["pytest"] {
+    glob = List("skills/review/plan-review/*.py", "tests/**/*.py", "pyproject.toml", "uv.lock")
+    check = "uv run --frozen pytest -q"
   }
   ["skills-manifest"] {
     glob = List("skills/**", ".claude-plugin/plugin.json")

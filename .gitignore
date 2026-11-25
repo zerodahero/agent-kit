@@ -2,3 +2,6 @@
 .DS_Store
 .claude/plan/
 node_modules/
+.venv/
+__pycache__/
+.pytest_cache/

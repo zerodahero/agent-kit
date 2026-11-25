@@ -5,6 +5,8 @@ editorconfig = true
 # long, and reflowing would churn skill text.
 # Skills and agents open with frontmatter and an instruction, not a heading.
 disable = ["MD013", "MD041"]
+# Test fixtures copy formats that other tools write, so they stay as written.
+exclude = ["tests/**/fixtures/**"]
 
 [MD060]
 enabled = true
