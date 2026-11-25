@@ -81,6 +81,10 @@ For one project only, save it to `.opencode/agents/second-reviewer.md` in that p
 instead. Without the agent, `/second-review` runs in your current agent, and the skill's
 instructions are the only guard against edits.
 
+An agent file does not update with the plugin. Download it again after each release that
+changes it. 0.7.0 does: the agent now denies `rg --pre`, which runs any command, and
+allows only `git branch --show-current` instead of every `git branch` form.
+
 ### Plan capture (optional)
 
 ```text
@@ -261,6 +265,11 @@ Base ref: `refs/heads/dev`.
 | copy, a heading, an ARIA role, a test id | `smoke-tests/tests/` |
 | a table or column | `database/alembic/versions/` |
 ```
+
+## Changelog
+
+Both plugins and the opencode package release together at one version. See
+[CHANGELOG.md](CHANGELOG.md) for what each release changed.
 
 ## License
 
