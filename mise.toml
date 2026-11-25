@@ -24,6 +24,10 @@ run = [
   "echo 'Run /reload-plugins, or restart Claude Code, to load the update.'",
 ]
 
+[tasks.eval]
+description = "Run the skill-triggering evals against this checkout (calls the model)"
+run = "claude plugin eval . --tag triggering --ablation none --max-cost-usd 5 --no-publish"
+
 [tasks."release:prepare"]
 description = "Set every manifest to a new version and prepend its changelog entry"
 usage = 'arg "<version>" help="The version to release, such as 0.7.0"'
