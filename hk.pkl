@@ -45,6 +45,10 @@ local linters = new Mapping<String, Step> {
       "for f in {{files}}; do head -1 \"$f\" | grep -q '^korin 1' || continue; korin check \"$f\" || exit 1; done && korin fmt --check {{files}}"
     fix = "korin fmt {{files}}"
   }
+  ["skills-manifest"] {
+    glob = List("skills/**", ".claude-plugin/plugin.json")
+    check = "scripts/check-skills.sh"
+  }
   ["versions-match"] {
     glob = List(".claude-plugin/plugin.json", "package.json")
     check = "scripts/check-versions.sh"
