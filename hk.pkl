@@ -49,6 +49,10 @@ local linters = new Mapping<String, Step> {
     glob = List("skills/**", ".claude-plugin/plugin.json")
     check = "scripts/check-skills.sh"
   }
+  ["opencode-agents"] {
+    glob = "opencode/agents/*.md"
+    check = "scripts/check-opencode-agents.sh"
+  }
   ["versions-match"] {
     glob = List(".claude-plugin/plugin.json", "package.json")
     check = "scripts/check-versions.sh"
