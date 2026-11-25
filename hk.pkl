@@ -78,6 +78,11 @@ local linters = new Mapping<String, Step> {
 }
 
 hooks {
+  ["commit-msg"] {
+    steps {
+      ["conventional-commit"] = Builtins.check_conventional_commit
+    }
+  }
   ["pre-commit"] {
     fix = true
     stash = "git"
