@@ -1,6 +1,6 @@
 {
   "name": "zerodahero-plan-capture",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Copies every plan you approve into .claude/plan/ in the repo, numbered, with current.md pointing at the latest.",
   "author": {
     "name": "Zack Teska",

@@ -3,6 +3,27 @@
 Every release ships the `zerodahero-skills` and `zerodahero-plan-capture` plugins and the
 `opencode-zerodahero` npm package at one version.
 
+## [0.7.1] - 2026-11-25
+
+### Fixed
+
+- **plan-review:** An empty `Attach:` line no longer fails the round. An empty value or
+  `none` attaches nothing.
+- **plan-review:** A denied tool call no longer fails an attempt when the report lists it
+  under `Denied calls`. `run-round.sh` checks the list itself and prints
+  `ran-with-denials`. It exits 3 only for a denied call the report leaves out.
+- **plan-review:** Round 2 and later no longer send the ledger. The round input already
+  carries it at the end of the plan.
+
+### Added
+
+- **plan-review:** `ledger.py show <plan>` prints the ledger without changing it.
+- **plan-review:** A `Depth:` line in the round 1 instructions names outline-only
+  sections. The reviewer checks what those sections must deliver, not how they are
+  built.
+- **plan-review:** The skill covers a review that starts after the plan is already open
+  in Plannotator.
+
 ## [0.7.0] - 2026-11-25
 
 ### Fixed
