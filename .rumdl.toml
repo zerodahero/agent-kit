@@ -1,0 +1,13 @@
+# Starts from the maintainer's global rumdl config.
+[global]
+editorconfig = true
+# Prose wraps near 90 by habit, but frontmatter descriptions, URLs and some files run
+# long, and reflowing would churn skill text.
+# Skills and agents open with frontmatter and an instruction, not a heading.
+disable = ["MD013", "MD041"]
+# Test fixtures copy formats that other tools write, so they stay as written.
+exclude = ["tests/**/fixtures/**"]
+
+[MD060]
+enabled = true
+style = "aligned"

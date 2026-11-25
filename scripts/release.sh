@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Tags and pushes a zerodahero-skills release. The tag starts release.yml, which publishes
-# the opencode plugin to npm. Takes the version as 0.2.2, v0.2.2, or the full tag.
+# Tags and pushes a release of both plugins and the opencode package. The tag starts
+# release.yml, which publishes the opencode plugin to npm and creates the GitHub release.
+# Takes the version as 0.7.0, v0.7.0, or an old-style zerodahero-skills--v0.7.0.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -12,7 +13,7 @@ fail() {
 version=${1:?usage: release.sh <version>}
 version=${version#zerodahero-skills--}
 version=${version#v}
-tag="zerodahero-skills--v$version"
+tag="v$version"
 package=$(node -p 'require("./package.json").name')
 
 [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || fail "$version is not a semver version like 0.2.2."
@@ -24,11 +25,13 @@ git fetch --quiet origin main --tags
 [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] \
   || fail "main differs from origin/main. Run git pull --ff-only."
 
-# The version bump lands through a PR, so both manifests must already carry it.
+# The version bump lands through a PR, so every manifest must already carry it.
 scripts/check-versions.sh
 current=$(node -p 'require("./package.json").version')
 [ "$current" = "$version" ] \
   || fail "the manifests are at $current, not $version. Merge a version bump first."
+grep -qF "## [$version]" CHANGELOG.md \
+  || fail "CHANGELOG.md has no $version entry. Run mise run release:prepare $version in the bump PR."
 
 # A version ships once: no existing tag, local or remote, and nothing on npm.
 if git rev-parse --quiet --verify "refs/tags/$tag" >/dev/null; then
@@ -41,6 +44,6 @@ if npm view "$package@$version" version >/dev/null 2>&1; then
   fail "$package@$version is already on npm, and npm never republishes a version."
 fi
 
-git tag -a "$tag" -m "zerodahero-skills $version"
+git tag -a "$tag" -m "agent-kit $version"
 git push origin "$tag"
 echo "Pushed $tag. Watch the publish with: gh run watch"

@@ -12,12 +12,22 @@ local linters = new Mapping<String, Step> {
   ["shellcheck"] = Builtins.shellcheck
   ["shfmt"] = Builtins.shfmt
 
+  // Python
+  ["ruff"] = Builtins.ruff
+  ["ruff-format"] = (Builtins.ruff_format) {
+    depends = "ruff"
+  }
+
   // Formats
   // Parse only. The jq builtin also sorts keys, which scrambles the manifests.
   ["json"] {
     glob = "**/*.json"
     batch = true
     check = "jq empty {{files}}"
+  }
+  // Test fixtures copy formats that other tools write, so they stay as written.
+  ["rumdl"] = (Builtins.rumdl) {
+    exclude = "tests/**/fixtures/**"
   }
   ["pkl-format"] = Builtins.pkl_format
   ["mise"] = Builtins.mise
@@ -45,13 +55,39 @@ local linters = new Mapping<String, Step> {
       "for f in {{files}}; do head -1 \"$f\" | grep -q '^korin 1' || continue; korin check \"$f\" || exit 1; done && korin fmt --check {{files}}"
     fix = "korin fmt {{files}}"
   }
+  ["opencode-plugin"] {
+    glob = List("opencode/**", "skills/review/second-review/**", "tests/opencode/**")
+    check = "node --check opencode/plugin.js && node --test 'tests/opencode/*.test.js'"
+  }
+  ["pytest"] {
+    glob = List("skills/review/plan-review/*.py", "tests/**/*.py", "pyproject.toml", "uv.lock")
+    check = "uv run --frozen pytest -q"
+  }
+  ["skills-manifest"] {
+    glob = List("skills/**", ".claude-plugin/plugin.json")
+    check = "scripts/check-skills.sh"
+  }
+  ["opencode-agents"] {
+    glob = "opencode/agents/*.md"
+    check = "scripts/check-opencode-agents.sh"
+  }
   ["versions-match"] {
-    glob = List(".claude-plugin/plugin.json", "package.json")
+    glob =
+      List(
+        ".claude-plugin/plugin.json",
+        "package.json",
+        "plugins/plan-capture/.claude-plugin/plugin.json",
+      )
     check = "scripts/check-versions.sh"
   }
 }
 
 hooks {
+  ["commit-msg"] {
+    steps {
+      ["conventional-commit"] = Builtins.check_conventional_commit
+    }
+  }
   ["pre-commit"] {
     fix = true
     stash = "git"

@@ -16,7 +16,15 @@ import sys
 from collections import Counter
 
 COLS = ["ID", "Sev", "Raised", "Finding", "Claude's decision", "Status", "Shift", "Depends on"]
-SIGNAL_COLS = ["Round", "New 🔴/🟡", "fix-caused", "new-surface", "missed-earlier", "Ping-pong", "Hotspot"]
+SIGNAL_COLS = [
+    "Round",
+    "New 🔴/🟡",
+    "fix-caused",
+    "new-surface",
+    "missed-earlier",
+    "Ping-pong",
+    "Hotspot",
+]
 DISPOSITION_STATUS = {
     "verified-fixed": "resolved",
     "rebuttal-accepted": "rebuttal-accepted",
@@ -67,11 +75,11 @@ class Plan:
             (i for i in range(self.start + 1, len(self.lines)) if self.lines[i].startswith("## ")),
             len(self.lines),
         )
-        self.header_at = self.find(lambda l: l.startswith("Reviewer:"), "the header line")
-        self.ledger_at = self.find(lambda l: l.startswith("| ID |"), "the ledger table")
-        self.signals_at = self.find(lambda l: l.startswith("| Round |"), "the signals table")
-        self.rows = [parse_row(l) for l in self.body(self.ledger_at)]
-        self.signals = [parse_row(l) for l in self.body(self.signals_at)]
+        self.header_at = self.find(lambda line: line.startswith("Reviewer:"), "the header line")
+        self.ledger_at = self.find(lambda line: line.startswith("| ID |"), "the ledger table")
+        self.signals_at = self.find(lambda line: line.startswith("| Round |"), "the signals table")
+        self.rows = [parse_row(line) for line in self.body(self.ledger_at)]
+        self.signals = [parse_row(line) for line in self.body(self.signals_at)]
         self.header = dict(
             part.split(": ", 1) for part in self.lines[self.header_at].split(" · ") if ": " in part
         )
@@ -100,8 +108,16 @@ class Plan:
         header = " · ".join(f"{k}: {v}" for k, v in self.header.items())
         parts = [
             (self.header_at, 1, [header]),
-            (self.ledger_at, 2 + len(self.body(self.ledger_at)), table_head(COLS) + [row_line(r) for r in self.rows]),
-            (self.signals_at, 2 + len(self.body(self.signals_at)), table_head(SIGNAL_COLS) + [row_line(r) for r in self.signals]),
+            (
+                self.ledger_at,
+                2 + len(self.body(self.ledger_at)),
+                table_head(COLS) + [row_line(r) for r in self.rows],
+            ),
+            (
+                self.signals_at,
+                2 + len(self.body(self.signals_at)),
+                table_head(SIGNAL_COLS) + [row_line(r) for r in self.signals],
+            ),
         ]
         # Replace from the bottom up, so earlier indexes stay valid.
         for at, length, new in sorted(parts, reverse=True):
@@ -145,7 +161,7 @@ def init(path):
 def parse_report(path):
     with open(path, encoding="utf-8") as f:
         lines = f.read().split("\n")
-    head = next((l for l in lines if l.startswith("Plan: ")), None)
+    head = next((line for line in lines if line.startswith("Plan: ")), None)
     if not head:
         die(f"{path} has no header line.")
     header = dict(p.split(": ", 1) for p in head.split(" · ") if ": " in p)
@@ -184,7 +200,10 @@ def apply(path, report, session):
     rnd = int(header.get("Round", "0"))
     done = int(plan.header.get("Rounds", "0"))
     if rnd != done + 1:
-        die(f"the report is round {rnd}, and the ledger holds {done} rounds. Merge round {done + 1} next.")
+        die(
+            f"the report is round {rnd}, and the ledger holds {done} rounds. "
+            f"Merge round {done + 1} next."
+        )
 
     # Map every new key first, so Depends on can name keys from the same report.
     next_id = max((int(r[0][2:]) for r in plan.rows), default=0) + 1
@@ -210,8 +229,10 @@ def apply(path, report, session):
     for lid, disp in dispositions:
         row = plan.row(lid)
         wanted = CLOSES.get(disp)
-        if row[5] not in OPEN_STATUSES or disp not in DISPOSITION_STATUS or (
-            wanted and not row[4].startswith(wanted)
+        if (
+            row[5] not in OPEN_STATUSES
+            or disp not in DISPOSITION_STATUS
+            or (wanted and not row[4].startswith(wanted))
         ):
             mismatched.append(f"{lid} {disp} (decision: {row[4] or 'none'}, status: {row[5]})")
             continue
@@ -227,11 +248,18 @@ def apply(path, report, session):
             lid = keymap[f["key"]]
             raised = f"{rnd} · {f['key']}" + (f" · {f['tag']}" if f["tag"] else "")
             low = f["sev"] == "🔵"
-            plan.rows.append([
-                lid, f["sev"], raised, esc(f["finding"]),
-                "defer — low" if low else "", "deferred" if low else "open",
-                esc(shift), translate(f["depends"]),
-            ])
+            plan.rows.append(
+                [
+                    lid,
+                    f["sev"],
+                    raised,
+                    esc(f["finding"]),
+                    "defer — low" if low else "",
+                    "deferred" if low else "open",
+                    esc(shift),
+                    translate(f["depends"]),
+                ]
+            )
             if not low:
                 needs.append(lid)
         else:
@@ -242,22 +270,36 @@ def apply(path, report, session):
             row[6] = esc(shift)
             needs.append(f["key"])
 
-    still = [r[0] for r in plan.rows
-             if r[5] in ("open", "disputed") and r[1] != "🔵" and r[0] not in needs]
+    still = [
+        r[0]
+        for r in plan.rows
+        if r[5] in ("open", "disputed") and r[1] != "🔵" and r[0] not in needs
+    ]
 
     blocking = [f for f in findings if f["key"] in keymap and f["sev"] != "🔵"]
+
     def share(tag):
         if rnd == 1 or not blocking:
             return "—"
         n = sum(1 for f in blocking if f["tag"] == tag)
         return f"{round(100 * n / len(blocking))}%"
+
     sections = Counter(f["section"] for f in findings if f["key"] in keymap)
     hotspot = "—"
     if sections:
         name, count = sections.most_common(1)[0]
         hotspot = f"{esc(name)} ({count})"
-    plan.signals.append([str(rnd), str(len(blocking)), share("fix-caused"), share("new-surface"),
-                         share("missed-earlier"), "—", hotspot])
+    plan.signals.append(
+        [
+            str(rnd),
+            str(len(blocking)),
+            share("fix-caused"),
+            share("new-surface"),
+            share("missed-earlier"),
+            "—",
+            hotspot,
+        ]
+    )
 
     plan.header["Reviewer"] = header.get("Reviewer", plan.header.get("Reviewer", "—"))
     plan.header["Session"] = session

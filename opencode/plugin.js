@@ -1,33 +1,12 @@
 // opencode v2 plugin: registers the second-review skill and the /second-review command.
-// Both are built from the skill files in this package, so the skill stays the single
-// source for what the reviewer does. The second-reviewer agent ships separately as
-// opencode/agents/second-reviewer.md, because plugins cannot add agents.
-import { readFile } from "node:fs/promises"
-import { fileURLToPath } from "node:url"
+// content.js builds both from the skill files in this package. The second-reviewer agent
+// ships separately as opencode/agents/second-reviewer.md, because plugins cannot add
+// agents.
 import { Plugin, Skill } from "@opencode/plugin"
-
-const skillDir = new URL("../skills/review/second-review/", import.meta.url)
-const skillPath = fileURLToPath(new URL("SKILL.md", skillDir))
+import { buildContent, skillPath } from "./content.js"
 
 const description =
   "Review this branch as an independent second reviewer and write the findings to a file for the primary agent"
-
-function stripFrontmatter(text) {
-  return text.replace(/^---\n[\s\S]*?\n---\n+/, "")
-}
-
-// The SKILL.md body with REVIEW-METHOD.md appended, so one prompt carries everything.
-async function buildContent() {
-  const [skill, method] = await Promise.all([
-    readFile(new URL("SKILL.md", skillDir), "utf8"),
-    readFile(new URL("REVIEW-METHOD.md", skillDir), "utf8"),
-  ])
-  const body = stripFrontmatter(skill).replaceAll(
-    "[REVIEW-METHOD.md](REVIEW-METHOD.md)",
-    "the Review method section below",
-  )
-  return `${body.trimEnd()}\n\n## Review method\n\n${method}`
-}
 
 export default Plugin.define({
   id: "zerodahero.second-review",

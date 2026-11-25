@@ -5,11 +5,34 @@ on:
     branches:
       - main
   pull_request:
+    # edited re-runs the title check when the title changes.
+    types: [opened, edited, synchronize, reopened]
 
 permissions:
   contents: read
 
 jobs:
+  pr-title:
+    name: Check the PR title
+    # PRs are squash-merged, so the title becomes the commit on main and the changelog entry.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Install tools from mise.toml
+        uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+
+      - name: Check the title follows Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          printf '%s\n' "$TITLE" > "$RUNNER_TEMP/title"
+          hk util check-conventional-commit "$RUNNER_TEMP/title"
+
   validate:
     name: Validate plugins
     runs-on: ubuntu-latest
@@ -27,9 +50,6 @@ jobs:
         env:
           # pinact verifies pinned SHAs against the GitHub API.
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Check the opencode plugin parses
-        run: node --check opencode/plugin.js
 
       - name: Install Claude Code
         # Installed here rather than in mise.toml, which would shadow the claude on

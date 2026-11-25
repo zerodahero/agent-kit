@@ -71,14 +71,14 @@ A diff hides its consequences in the files it doesn't touch. Resolve each right-
 path in this repo before you grep — glob for the convention: a migrations directory, an
 `.env.example`, a `smoke-tests/` or `e2e/` tree, a shared component package.
 
-| The diff changes | Grep the old string in |
-| --- | --- |
-| user-facing copy, a heading, an ARIA role, a test id | the e2e or smoke suite |
-| a documentation heading | the docs source (anchors break links) |
-| a table or column | the migrations directory |
-| an env var | the example env file and the env var doc |
-| button, chip, tabs, toast, badge, stepper markup | the shared component library's public exports |
-| a workflow's steps, children, or branching | any doc whose diagram tracks that code |
+| The diff changes                                     | Grep the old string in                        |
+| ---------------------------------------------------- | --------------------------------------------- |
+| user-facing copy, a heading, an ARIA role, a test id | the e2e or smoke suite                        |
+| a documentation heading                              | the docs source (anchors break links)         |
+| a table or column                                    | the migrations directory                      |
+| an env var                                           | the example env file and the env var doc      |
+| button, chip, tabs, toast, badge, stepper markup     | the shared component library's public exports |
+| a workflow's steps, children, or branching           | any doc whose diagram tracks that code        |
 
 This step is done when every row has either a grep behind it or a one-line note. Report
 the empty greps too, and note a row that has no counterpart in this repo the same way.
@@ -133,11 +133,11 @@ even though the file holding it is untouched.
 
 **A severity on every finding**, from this fixed set:
 
-| Marker | Severity | Means |
-| --- | --- | --- |
-| 🔴 | High | Wrong behaviour, data loss, a security or authorization hole |
-| 🟡 | Medium | A citable rule broken where the code still behaves correctly, or a correctness risk under a narrow condition |
-| 🔵 | Low | Judgement, naming, a suggestion |
+| Marker | Severity | Means                                                                                                        |
+| ------ | -------- | ------------------------------------------------------------------------------------------------------------ |
+| 🔴     | High     | Wrong behaviour, data loss, a security or authorization hole                                                 |
+| 🟡     | Medium   | A citable rule broken where the code still behaves correctly, or a correctness risk under a narrow condition |
+| 🔵     | Low      | Judgement, naming, a suggestion                                                                              |
 
 A **snippet** is the 1–3 lines a finding is about, copied verbatim into a fenced block
 with a language tag, trimmed with `…`. Locate code by path and snippet; a path carries no
@@ -148,7 +148,7 @@ function the test should cover. A systemic finding with no single site takes no 
 Every finding is its own `-` bullet: one line, then its snippet indented under it, in
 this shape:
 
-````
+````text
 - 🔴 **High** · changed-line · path — what breaks — the rule or grep that shows it
 
   ```ts

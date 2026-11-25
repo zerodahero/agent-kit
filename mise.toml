@@ -1,12 +1,17 @@
 [tools]
 actionlint = "1.7.12"
 "github:zerodahero/korin" = "0.1.2"
+git-cliff = "2.14.2"
 hk = { version = "2.10.0", workflow = "release.yml" }
 node = "24"
 pinact = "5.0.2"
 pkl = "0.32.2"
+python = "3.13"
+ruff = "0.17.3"
+rumdl = "0.3.5"
 shellcheck = "0.11.0"
 shfmt = "3.14.1"
+uv = "0.13.9"
 zizmor = "1.31.1"
 
 [tasks."plugin:update"]
@@ -19,7 +24,16 @@ run = [
   "echo 'Run /reload-plugins, or restart Claude Code, to load the update.'",
 ]
 
+[tasks.eval]
+description = "Run the skill-triggering evals against this checkout (calls the model)"
+run = "claude plugin eval . --tag triggering --ablation none --max-cost-usd 5 --no-publish"
+
+[tasks."release:prepare"]
+description = "Set every manifest to a new version and prepend its changelog entry"
+usage = 'arg "<version>" help="The version to release, such as 0.7.0"'
+run = 'scripts/prepare-release.sh "${usage_version}"'
+
 [tasks.release]
-description = "Tag and push a zerodahero-skills release after checking the version is new"
-usage = 'arg "<version>" help="The version to release, such as 0.2.2"'
+description = "Tag and push a release of both plugins and the opencode package"
+usage = 'arg "<version>" help="The version to release, such as 0.7.0"'
 run = 'scripts/release.sh "${usage_version}"'
