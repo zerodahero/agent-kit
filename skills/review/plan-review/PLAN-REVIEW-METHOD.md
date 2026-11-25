@@ -88,13 +88,17 @@ or a one-line note.
    - `still-open`: the fix is missing or partial.
 
    An ID you leave out counts as `still-open`.
+
 2. **Regressions.** Recheck each `resolved` item whose assumptions the diff or a new
    anchor version touches. Where the item broke again, reopen it under its own ID as a
    finding tagged `regression`, with new evidence.
+
 3. **The diff.** Work the round-1 lenses over the changed text.
+
 4. **The anchor.** Re-check the whole plan against the current anchor. A revision that
    moves the plan away from an anchor item is **drift**. Flag it. This is how a quiet
    concession surfaces.
+
 5. **The rest.** Anything new you notice in unchanged text.
 
 Tag every new finding:
@@ -128,11 +132,11 @@ leave the rest of the round's findings in the report too.
 
 ## 6. Severity
 
-| Marker | Severity | Means |
-| --- | --- | --- |
-| 🔴 | High | Built as written, the plan produces wrong behaviour, loses data, or opens a security or authorization hole |
-| 🟡 | Medium | A citable rule the plan breaks, a correctness risk under a narrow condition, a false codebase assumption that a step rests on, no test strategy |
-| 🔵 | Low | Judgement, naming, a nicer alternative, a test preference |
+| Marker | Severity | Means                                                                                                                                           |
+| ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🔴     | High     | Built as written, the plan produces wrong behaviour, loses data, or opens a security or authorization hole                                      |
+| 🟡     | Medium   | A citable rule the plan breaks, a correctness risk under a narrow condition, a false codebase assumption that a step rests on, no test strategy |
+| 🔵     | Low      | Judgement, naming, a nicer alternative, a test preference                                                                                       |
 
 A finding that cannot name the plan text, the code, or the rule behind it is at most
 **Low**.
@@ -185,7 +189,7 @@ code by path and snippet, with no line number.
 
 Every finding is its own `-` bullet: one line, then its snippets indented under it:
 
-````
+````text
 - 🔴 **High** · R2-F1 · fix-caused · Shift: load-bearing (A2) drift · Depends on: L-04 · §Backfill — the backfill now writes `benefit` directly, which A2 rules out
 
   ```markdown

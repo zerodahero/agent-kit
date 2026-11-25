@@ -168,33 +168,38 @@ Keep the key map for the next round.
 
    `set` also takes `<ID> | status | <status>`, `<ID> | shift | <shift>`, and
    `header | Status | <status>`.
+
 2. Check each finding's direction yourself. Where acting on it would pull the plan away
    from an anchor item, record the shift as yours. Where you and the reviewer read the
    shift differently, record both readings.
+
 3. Where any finding carries a load-bearing shift, by either reading, stop here and go
    to step 6. The plan stays as it is until the user answers, so nothing touches a
    locked decision first.
+
 4. Revise the plan for every accepted item. Cite an item that needs code as `(L-xx)` on
    the plan step that implements it. Mark one fixed in the plan text alone as
    `accept (plan-only)`.
+
 5. Add a bullet to the plan's `## Revision notes` that cites the ledger IDs it acts on:
    `R2: moved the backfill into the workflow (L-04, L-07).`
+
 6. Fill in the signals row's Ping-pong cell when an item was rebutted twice.
 
 ## 6. Decide what comes next
 
 Take the first row that matches:
 
-| State | Next |
-|---|---|
-| A load-bearing shift, from either agent | **Halt.** Set the ledger status to `halted` and escalate it now (step 7). The rest of the review waits on the answer. |
-| An item rebutted twice (**ping-pong**) | Escalate it now. |
-| An item the reviewer marked `disputed` | Escalate it now. |
-| Half or more of this round's new 🔴/🟡 are `fix-caused`, and at least 2 | Escalate them now. Your fixes are creating problems. `new-surface` findings never count here: new design draws new findings. |
-| The reviewer's header says `Recommend: stop` | Escalate every open 🔴 and 🟡 (step 7), with the reviewer's reason. |
-| Every 🔴 and 🟡 is closed by the closure table, or `escalated` | Go to step 7 with whatever is escalated, then step 8. |
-| `N` is under 5 | Run round `N + 1`. |
-| `N` is 5 or more | Ask the user whether to run another round. Show this round's signals row, the open items, and your recommendation. On a no, escalate every open 🔴 and 🟡 (step 7), so none reaches the user as silently closed. |
+| State                                                                   | Next                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A load-bearing shift, from either agent                                 | **Halt.** Set the ledger status to `halted` and escalate it now (step 7). The rest of the review waits on the answer.                                                                                            |
+| An item rebutted twice (**ping-pong**)                                  | Escalate it now.                                                                                                                                                                                                 |
+| An item the reviewer marked `disputed`                                  | Escalate it now.                                                                                                                                                                                                 |
+| Half or more of this round's new 🔴/🟡 are `fix-caused`, and at least 2 | Escalate them now. Your fixes are creating problems. `new-surface` findings never count here: new design draws new findings.                                                                                     |
+| The reviewer's header says `Recommend: stop`                            | Escalate every open 🔴 and 🟡 (step 7), with the reviewer's reason.                                                                                                                                              |
+| Every 🔴 and 🟡 is closed by the closure table, or `escalated`          | Go to step 7 with whatever is escalated, then step 8.                                                                                                                                                            |
+| `N` is under 5                                                          | Run round `N + 1`.                                                                                                                                                                                               |
+| `N` is 5 or more                                                        | Ask the user whether to run another round. Show this round's signals row, the open items, and your recommendation. On a no, escalate every open 🔴 and 🟡 (step 7), so none reaches the user as silently closed. |
 
 An accepted fix closes only when the reviewer verifies it, so the last round of a loop
 is a verification round.

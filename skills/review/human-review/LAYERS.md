@@ -43,6 +43,7 @@ The question: how is it built, and where does each file fit?
 
 - **Approach.** The architecture choice in one sentence. Use up to three only when there are
   separate choices.
+
 - **Diagram.** A Mermaid `flowchart` of the parts this change touches and how they connect.
   Give each node a short, stable id and a readable label. Leave out parts the change does
   not reach. Mark new and changed nodes with these two class definitions, copied exactly.
@@ -54,6 +55,7 @@ The question: how is it built, and where does each file fit?
   ```
 
   Every other node keeps the theme's default style.
+
 - **Files.** A file tree in a `text` block, holding only the directories on the path to a
   changed file. Collapse unchanged siblings to `…`. Mark each changed file `+` added, `~`
   modified, or `-` deleted, and end its line with `→ <node id>` for the diagram node it
@@ -67,6 +69,7 @@ The question: what path does the change take at run time, and where does that pa
   entry point to side effect. At most two diagrams. Label each **seam** arrow
   `<label>: <name>`, using the seam kinds in [`SEAMS.md`](SEAMS.md). When the path changed,
   mark new steps with `Note over` and the word "new".
+
 - **Seams.** For each seam the diagram crosses, in the order it crosses them, a close-up
   of that one hop. No code: a hunk means little out of context, and the code review shows
   it in place.
@@ -95,6 +98,7 @@ The question: what path does the change take at run time, and where does that pa
   - NotifyReviewer: `api/src/notify/notify-reviewer.listener.ts:12`
   - NotificationsModule: `api/src/notify/notifications.module.ts:8`
   ````
+
 - Write "No seams" under the diagram when the path crosses none.
 
 ## 04-tests.md
@@ -105,10 +109,12 @@ Show test **names**, not test code, in testdox form. The code review stage cover
 code.
 
 - **Scope.** Every test the diff adds, changes, or removes. Leave out unchanged tests.
+
 - **Components.** When the changed tests sit in more than one component of a monorepo,
   such as `frontend` and `webserver`, give each component a `## <component>` heading. Name
   it after the component's top-level directory. In a single-component repo, use no
   component headings.
+
 - **Shape.** One list per test file. Its top item is the file's outer `describe` (or
   equivalent) in bold, followed by the file's path in parentheses, like a citation. A file
   with no outer `describe` takes the name of the unit it tests. Under that item, a nested
@@ -121,6 +127,8 @@ code.
       - [new] rejects a submission
       - [changed] tells the applicant the closing date
   ```
+
 - **Names as written.** Copy each name from the code. Turn a `should_x_when_y` or
   `testXWhenY` name into words. Leave its meaning alone.
+
 - Write "No tests changed" when the diff touches no test. The reader will note it.

@@ -47,12 +47,12 @@ Glob `.claude/plan/second-review-<branch>-*.md`, and set aside every second revi
 triaged. For each one left, compare its SHA with HEAD. Where they differ, the review is
 **stale** by `git rev-list --count <sha>..HEAD` commits.
 
-| Found | Mode |
-| --- | --- |
-| `second` in `$ARGUMENTS` | **Full with second**, merging every untriaged second review as well |
-| `full` in `$ARGUMENTS` | **Full**, merging every untriaged second review |
-| No untriaged second review | **Full** |
-| Untriaged second reviews, none stale | **Second only** |
+| Found                                    | Mode                                                                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `second` in `$ARGUMENTS`                 | **Full with second**, merging every untriaged second review as well                                                            |
+| `full` in `$ARGUMENTS`                   | **Full**, merging every untriaged second review                                                                                |
+| No untriaged second review               | **Full**                                                                                                                       |
+| Untriaged second reviews, none stale     | **Second only**                                                                                                                |
 | An untriaged second review that is stale | Ask with `AskUserQuestion`: triage the second reviews alone, marked stale (recommended), or run a full review that merges them |
 
 Say the mode in one line, with each second review you take and whether it is current or
@@ -82,6 +82,7 @@ finish.
 
 1. Start the `zerodahero-skills:code-reviewer` agent in the background, with the plan
    path and the diff base, as in **Full**.
+
 2. Start the second review in the background with `run_in_background`, from the repo
    root, with the sandbox disabled:
 
@@ -92,17 +93,18 @@ finish.
    The **reviewer** is `opencode-<model>`, where `<model>` is the part of the second
    model after its last `/`, or `opencode` without a second model. Pass each flag only
    when you have its value.
+
 3. Say in one line that both reviewers are running. Wait for both completion
    notifications. The second review usually finishes last.
 
 Read the script's output:
 
-| Exit | Do |
-| --- | --- |
-| 0 | Take the report at `report:` as a second review of this run. |
-| 3 | Take the report. List the `denied` lines in one line under the triage's verdict line. |
-| 1 | Triage the primary findings alone. The verdict line says the second review failed, with the reason from the `result:` line. |
-| 2 | As for 1, with the reason from the `error:` line. |
+| Exit | Do                                                                                                                          |
+| ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| 0    | Take the report at `report:` as a second review of this run.                                                                |
+| 3    | Take the report. List the `denied` lines in one line under the triage's verdict line.                                       |
+| 1    | Triage the primary findings alone. The verdict line says the second review failed, with the reason from the `result:` line. |
+| 2    | As for 1, with the reason from the `error:` line.                                                                           |
 
 Then continue as in **Full**: add the `Merged:` line to the primary report, with this
 run's second review on it, and triage the whole set.
@@ -137,16 +139,16 @@ than its line number, since the lines may have moved.
 
 Sort every finding into exactly one bucket.
 
-| Bucket | Means |
-| --- | --- |
-| **Should fix** | In scope for the work, or adjacent to what this branch changed |
-| **Could fix** | Just outside the scope, noticed because of the changes or the changed files |
-| **Out of scope** | Genuinely separate work — a follow-up ticket or its own initiative |
-| **Skip** | Not valid — a false positive, a misread, or a rule that does not apply here |
+| Bucket           | Means                                                                       |
+| ---------------- | --------------------------------------------------------------------------- |
+| **Should fix**   | In scope for the work, or adjacent to what this branch changed              |
+| **Could fix**    | Just outside the scope, noticed because of the changes or the changed files |
+| **Out of scope** | Genuinely separate work — a follow-up ticket or its own initiative          |
+| **Skip**         | Not valid — a false positive, a misread, or a rule that does not apply here |
 
 The reviewers tag each finding with its proximity to the diff. Map it, then adjust:
 
-```
+```text
 changed-line  → Should fix
 changed-file  → Could fix
 elsewhere     → Out of scope

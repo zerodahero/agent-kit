@@ -121,7 +121,7 @@ block.
 
 Use this exact format, unchanged, every time:
 
-```
+```text
 **Progress — 3/7**
 
 ✅ alembic migration, repository method, unit spec

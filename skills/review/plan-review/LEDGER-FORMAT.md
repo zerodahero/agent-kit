@@ -20,11 +20,11 @@ One line under the heading:
 
 ## Table
 
-| ID | Sev | Raised | Finding | Claude's decision | Status | Shift | Depends on |
-|---|---|---|---|---|---|---|---|
-| L-01 | 🔴 | 1 · R1-F1 | §Backfill — the backfill has no rollback. | accept — add a reversible staging table (L-01 on step 3) | resolved | none | — |
-| L-02 | 🟡 | 2 · R2-F1 · fix-caused | §Backfill — the staging table bypasses A2. | rebut — the table is new, `benefit` is untouched | rebuttal-accepted | load-bearing (A2), reviewer | L-01 |
-| L-03 | 🔵 | 1 · R1-F4 | §Tests — name tests after behaviour. | defer — low | deferred | none | — |
+| ID   | Sev | Raised                 | Finding                                    | Claude's decision                                        | Status            | Shift                       | Depends on |
+| ---- | --- | ---------------------- | ------------------------------------------ | -------------------------------------------------------- | ----------------- | --------------------------- | ---------- |
+| L-01 | 🔴  | 1 · R1-F1              | §Backfill — the backfill has no rollback.  | accept — add a reversible staging table (L-01 on step 3) | resolved          | none                        | —          |
+| L-02 | 🟡  | 2 · R2-F1 · fix-caused | §Backfill — the staging table bypasses A2. | rebut — the table is new, `benefit` is untouched         | rebuttal-accepted | load-bearing (A2), reviewer | L-01       |
+| L-03 | 🔵  | 1 · R1-F4              | §Tests — name tests after behaviour.       | defer — low                                              | deferred          | none                        | —          |
 
 - **ID**: `L-01` and up, assigned at merge, stable across rounds. Never reuse one.
 - **Sev**: 🔴, 🟡, or 🔵.
@@ -45,13 +45,13 @@ One line under the heading:
 
 Each outcome has one owner who closes it. Claude cannot close a 🔴 or 🟡 on its own.
 
-| Claude's decision | Closed when | Status |
-|---|---|---|
-| accept | the reviewer reports `verified-fixed` | `resolved` |
-| rebut | the reviewer reports `rebuttal-accepted` | `rebuttal-accepted` |
-| defer, on a 🟡 | the reviewer reports `deferral-accepted` | `deferred` |
-| defer, on a 🔵 | at once, with no reviewer step | `deferred` |
-| any, then disputed or a shift | the user answers the escalation | `human-decided: fix`, `human-decided: accept risk`, or `human-decided: drop` |
+| Claude's decision             | Closed when                              | Status                                                                       |
+| ----------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| accept                        | the reviewer reports `verified-fixed`    | `resolved`                                                                   |
+| rebut                         | the reviewer reports `rebuttal-accepted` | `rebuttal-accepted`                                                          |
+| defer, on a 🟡                | the reviewer reports `deferral-accepted` | `deferred`                                                                   |
+| defer, on a 🔵                | at once, with no reviewer step           | `deferred`                                                                   |
+| any, then disputed or a shift | the user answers the escalation          | `human-decided: fix`, `human-decided: accept risk`, or `human-decided: drop` |
 
 The user's dispositions: `fix` acts on the finding, `accept risk` keeps the plan and
 records the risk, and `drop` rules the finding out.
@@ -85,10 +85,10 @@ it. Code review ignores it, along with `superseded`, `withdrawn`, and uncited ro
 
 A table below the ledger, one row per successful round. `ledger.py apply` writes it:
 
-| Round | New 🔴/🟡 | fix-caused | new-surface | missed-earlier | Ping-pong | Hotspot |
-|---|---|---|---|---|---|---|
-| 1 | 5 | — | — | — | — | §Backfill (3) |
-| 2 | 4 | 25% | 75% | 0% | — | §Staging (3) |
+| Round | New 🔴/🟡 | fix-caused | new-surface | missed-earlier | Ping-pong | Hotspot       |
+| ----- | --------- | ---------- | ----------- | -------------- | --------- | ------------- |
+| 1     | 5         | —          | —           | —              | —         | §Backfill (3) |
+| 2     | 4         | 25%        | 75%         | 0%             | —         | §Staging (3)  |
 
 - **fix-caused**, **new-surface**, and **missed-earlier**: shares of that round's new
   🔴/🟡.
