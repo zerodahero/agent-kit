@@ -1,6 +1,6 @@
 {
   "name": "opencode-zerodahero",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "opencode plugin for zerodahero-skills: adds the second-review skill and the /second-review command.",
   "type": "module",
   "files": [
