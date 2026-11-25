@@ -5,11 +5,12 @@
 #
 # Usage: run-round.sh <slug> <round> <plan> [provider/model] < instructions
 #
-# stdin carries the author's instructions: the anchor version, the ledger, the key map.
+# stdin carries the author's instructions: the anchor version and the key map. The
+# ledger reaches the reviewer inside the round input, at the end of the plan.
 # Each `Attach: <path>` line in them attaches that file, so the reviewer can read a
-# reference outside the repo.
-# Exit codes: 0 the attempt ran clean; 1 opencode failed; 2 bad input; 3 a tool was
-# denied, and the report must account for each denied call it printed.
+# reference outside the repo. An empty value or `none` attaches nothing.
+# Exit codes: 0 the attempt ran, and the report lists every denied call; 1 opencode
+# failed; 2 bad input; 3 a denied call is missing from the report's Denied calls.
 set -euo pipefail
 
 fail() {
@@ -93,12 +94,15 @@ instructions=$(cat)
 
 attachments=()
 while IFS= read -r path; do
+  # A blank field is the natural way to say "nothing to attach".
+  path=$(printf '%s' "$path" | sed 's/[[:space:]]*$//')
+  case $path in '' | none | None | NONE) continue ;; esac
   path=${path/#\~/$HOME}
   [ -f "$path" ] || fail "Attach: no file at $path."
   attachments+=(--file "$path")
 done < <(printf '%s\n' "$instructions" | sed -n 's/^Attach:[[:space:]]*//p')
 
-# The prompt travels as an attachment: a long diff or ledger would overflow argv.
+# The prompt travels as an attachment: a long diff would overflow argv.
 {
   echo "Plan review, round $round."
   echo
@@ -150,12 +154,25 @@ chmod a-w "$prompt_file" "$events"
 [ -f "$report" ] && chmod a-w "$report"
 
 # A denied call comes back to the model as a tool error, and opencode still exits 0.
-denied=$(jq -r 'select(.type == "tool_use" and .part.state.status == "error")
+# The method has the reviewer list each denied call verbatim under **Denied calls**, so
+# the script checks that list itself. Whitespace is collapsed on both sides.
+section=""
+if [ -f "$report" ]; then
+  section=$(awk '/^\*\*Denied calls\*\*/ { on = 1; print; next } on && /^\*\*/ { exit } on' "$report")
+fi
+scan=$(jq -r --arg sec "$section" '
+  def flat: gsub("\\s+"; " ") | ltrimstr(" ") | rtrimstr(" ");
+  select(.type == "tool_use" and .part.state.status == "error")
   | select((.part.state.error // "") | test("Permission denied|Blocked by configuration policy"))
-  | "\(.part.tool): \(.part.state.input.command // .part.state.input.path // .part.state.input | tostring)"' "$events") || {
+  | (.part.state.input.command // .part.state.input.filePath // .part.state.input.path
+     // .part.state.input | tostring | flat) as $call
+  | (if ($sec | flat | contains($call)) then "listed" else "missing" end)
+    + "\t\(.part.tool): \($call)"' "$events") || {
   echo "result: failed (opencode's event log does not parse)"
   exit 1
 }
+denied=$(printf '%s' "$scan" | cut -f2-)
+missing=$(printf '%s' "$scan" | grep '^missing' | cut -f2- || true)
 denials=$(printf '%s' "$denied" | grep -c . || true)
 # jq picks the lines itself: a `| head` would close the pipe early, and pipefail would
 # end the script before it prints a result.
@@ -169,15 +186,19 @@ echo "input: ${input#"$top"/} sha256:$hash"
 echo "session: $session"
 echo "attempt: $attempt"
 echo "denials: $denials"
-[ -n "$denied" ] && printf '  denied %s\n' "$denied"
+[ -n "$scan" ] && printf '%s\n' "$scan" | awk -F'\t' '{ print "  denied, " $1 " in report: " $2 }'
 [ -n "$errors" ] && echo "opencode errors: $errors"
 
 if [ "$status" -ne 0 ] || [ -n "$errors" ]; then
   echo "result: failed (opencode exit $status)"
   exit 1
 fi
-if [ "$denials" -gt 0 ]; then
-  echo "result: failed ($denials denied tool calls; see ${events#"$top"/})"
+if [ -n "$missing" ]; then
+  echo "result: failed (denied calls missing from the report's Denied calls; see ${events#"$top"/})"
   exit 3
+fi
+if [ "$denials" -gt 0 ]; then
+  echo "result: ran-with-denials (the report lists all $denials)"
+  exit 0
 fi
 echo "result: ran"

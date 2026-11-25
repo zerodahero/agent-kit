@@ -216,6 +216,24 @@ def test_set_rejects_bad_edits(plan, edit, message):
     assert message in fails("set", plan, stdin=edit + "\n")
 
 
+# show
+
+
+def test_show_prints_the_ledger_and_leaves_the_plan_alone(plan):
+    ok("init", plan)
+    apply_round(plan, 1)
+    before = plan.read_text()
+    out = ok("show", plan)
+    assert plan.read_text() == before
+    assert out.startswith("## Review ledger\n")
+    assert "| L-01 |" in out and "### Signals" in out and "### Escalations" in out
+    assert "## Anchor" not in out
+
+
+def test_show_needs_a_ledger(plan):
+    assert "Run `ledger.py init` first" in fails("show", plan)
+
+
 def test_usage_on_bad_arguments():
     assert "ledger.py init" in fails("frobnicate")
 

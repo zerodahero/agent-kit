@@ -33,6 +33,12 @@ the scoped work for a **load-bearing** decision: architecture, a data model, an 
 contract, or a scope boundary. With one, offer the review in one `AskUserQuestion` and
 start on a yes. With none, write the plan without the loop and say nothing about it.
 
+The plan may already be open in Plannotator: `ExitPlanMode` ran before the user asked
+for review. The user may be annotating that version. Ask whether they have notes on it
+before you start. Apply notes they send under their own revision rules, then start the
+loop on the revised plan. Tell the user that the loop ends in a new version, so notes on
+the open version after this point are lost.
+
 `$ARGUMENTS`, when present, is a `provider/model` for the reviewer. Without it, the
 reviewer runs on opencode's default model.
 
@@ -104,27 +110,42 @@ The **instructions** carry what only you know. In round 1, use this shape:
 Anchor: v1
 Key files: <paths the plan changes or rests on, one line each>
 External references: <docs outside the repo the plan relies on>
-Attach: <absolute path of each external reference, one line each>
+Attach: <absolute path of one external reference; one line per file>
 Must not run: <commands or systems the reviewer must leave alone, or "none">
 Focus: <the 1–3 risks you most want checked>
+Depth: <outline-only sections, or "full">
 ```
 
 The script attaches each `Attach:` file, so the reviewer reads it without leaving the
-repo. From round 2 on, send the anchor's current version, the ledger table, and the key
-map that `ledger.py apply` printed (`R1-F2 → L-03`). Add any rebuttal or deferral reason
-the reviewer has not yet seen. The script adds the round input, its hash, the report path, the diff, and in round 1 the
+repo. `Attach:` is optional: leave it out, or write `none`, when there is nothing to
+attach.
+
+`Depth:` names the sections that are outlines, such as later phases that get their own
+plans. The reviewer checks that such a section states its obligation, not how it is
+built. Without the line, every section draws full-depth findings.
+
+From round 2 on, send the anchor's current version and the key map that `ledger.py
+apply` printed (`R1-F2 → L-03`). Repeat `Depth:` when it changed. The ledger needs no
+copy: it sits at the end of the plan, so the round input carries it, and the diff shows
+what changed in it. Add a rebuttal or deferral argument only when it is longer than the
+one-line reason in its decision cell. The script adds the round input, its hash, the report path, the diff, and in round 1 the
 method. It sends them as one attached prompt file, and keeps the prompt and opencode's
 event log beside the report.
 
 Wait for the completion notification. The script's output names the report path, the
-input hash, the session, and the result.
+input hash, the session, and the result: `ran`, `ran-with-denials`, or `failed`.
+
+`ran-with-denials` means a tool call was denied, and the script found each denied call in
+the report's `Denied calls` section. That attempt is valid. A check the reviewer could not
+complete shows up in `Coverage`, which the checks below cover.
 
 **Check the attempt.** The attempt fails when any of these holds:
 
 - the script exits 1 or 2
-- the script exits 3 (denied calls), and the report's `Denied calls` section leaves out
-  one of the calls the script printed. Every denial the report accounts for is
-  acceptable: a check it could not complete shows up in `Coverage` instead.
+- the script exits 3: a denied call it printed as `missing in report` is not in the
+  report's `Denied calls` section. Check those lines by hand first. When the report
+  lists the call in other words, such as a reflowed multi-line command, the attempt
+  stands.
 - the report path the script printed holds no report
 - the report's verdict line or header line does not parse
 - the header's `Input` hash differs from the hash the script printed, or its `Round` or
