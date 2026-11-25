@@ -11,8 +11,11 @@ Each round's message names:
 - the **round input**: an attached copy of the plan, frozen for this round
 - any **references** the author attached: files outside the repo that the plan relies
   on, such as a tool's syntax guide. Read them as attachments.
-- from round 2 on: the **diff** between the last round input and this one, the current
-  **ledger**, and the **key map** from your last round's keys to ledger IDs (`R1-F2 → L-03`)
+- an optional **depth** line, `Depth: <sections>`: the sections that are outlines, such
+  as later phases that get their own plans (see section 3)
+- from round 2 on: the **diff** between the last round input and this one, and the
+  **key map** from your last round's keys to ledger IDs (`R1-F2 → L-03`). The current
+  **ledger** is the `## Review ledger` section at the end of the round input.
 
 The **anchor** is the locked block at the top of the plan, with a version (`Anchor v1`).
 It records what the user and the author agreed before the plan existed: purpose, a
@@ -71,6 +74,12 @@ Grade a validation finding by its consequence. A stylistic test preference is �
 specific, evidenced gap in validating a load-bearing item follows the severity table and
 can be 🟡 or 🔴: a missing rollback assertion, a missing authorization-negative case, a
 missing workflow replay check. A plan with no test strategy at all is 🟡.
+
+A section the `Depth:` line names is an **outline**: a later plan builds it. Review an
+outline for its obligation alone: what it must deliver, the anchor items it touches, and
+the constraints it puts on the rest of the plan. A missing or contradicted obligation is
+a finding. Mechanics the outline leaves out, such as steps, error paths, and tests, are
+not. The depth line holds in every round until the author sends a new one.
 
 ## 4. Rounds 2 and later
 

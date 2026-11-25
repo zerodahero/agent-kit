@@ -4,6 +4,7 @@
   ledger.py init  <plan>                      append an empty ledger
   ledger.py apply <plan> <report> <session>   merge one round's report
   ledger.py set   <plan> < edits              set cells, one edit per line
+  ledger.py show  <plan>                      print the ledger section, read-only
 
 `apply` maps the report's new keys to ledger IDs, applies its dispositions, reopens
 regressions, adds a signals row, and prints what the author decides next. `set` reads
@@ -320,6 +321,16 @@ def apply(path, report, session):
     print("still open (keep or change the decision): " + (", ".join(still) or "none"))
 
 
+def show(path):
+    plan = Plan(path)
+    if plan.start is None:
+        die("the plan has no ledger. Run `ledger.py init` first.")
+    section = plan.lines[plan.start : plan.end]
+    while section and section[-1] == "":
+        section.pop()
+    print("\n".join(section))
+
+
 def set_cells(path):
     plan = Plan(path)
     if plan.start is None:
@@ -354,6 +365,8 @@ def main():
         apply(*args[1:])
     elif args[:1] == ["set"] and len(args) == 2:
         set_cells(args[1])
+    elif args[:1] == ["show"] and len(args) == 2:
+        show(args[1])
     else:
         die(__doc__)
 
