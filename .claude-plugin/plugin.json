@@ -1,6 +1,6 @@
 {
   "name": "zerodahero-skills",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "General-purpose agent skills for planning, code review and naming: a plan red-team, a branch reviewer, a second-opinion reviewer for other harnesses, a layered review for humans, and a domain-term glossary check.",
   "author": {
     "name": "Zack Teska",

@@ -3,6 +3,35 @@
 Every release ships the `zerodahero-skills` and `zerodahero-plan-capture` plugins and the
 `opencode-zerodahero` npm package at one version.
 
+## [0.7.0] - 2026-11-25
+
+### Fixed
+
+- **opencode:** The `second-reviewer` agent no longer allows `rg --pre`, which runs any
+  command, or every `git branch` form, which includes `git branch -D`. It now uses the
+  V2 `permissions` list with the same deny rules as `plan-reviewer`. Download
+  `second-reviewer.md` again to get the fix.
+
+### Changed
+
+- Both plugins and the npm package now release together at one version, tagged
+  `v<version>`. `zerodahero-plan-capture` jumps from 0.1.0 to 0.7.0 to match.
+- Each release has a GitHub release, with its notes taken from this changelog.
+
+### Maintenance
+
+- CI checks that every shipped skill is in the plugin's skills list, and that every
+  `agents/openai.yaml` has a display name and a short description under 60 characters.
+- CI checks that the two opencode reviewer agents share one read-only shell policy.
+- Tests cover `ledger.py` (pytest through uv) and the opencode `second-review` prompt
+  (`node:test`).
+- ruff lints Python, and rumdl lints Markdown.
+- Commit messages and PR titles follow Conventional Commits, checked by an hk
+  `commit-msg` hook and in CI. git-cliff drafts each changelog entry.
+- Renovate keeps the mise tools, pinned actions, Python dev dependencies, and the
+  Claude Code and hk versions current.
+- `mise run eval` runs skill-triggering evals locally.
+
 ## [0.6.0] - 2026-11-25
 
 ### Added
