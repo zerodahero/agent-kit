@@ -114,6 +114,16 @@ a gitignore.
 step when it is installed. Without it, the skill asks through Claude Code's question
 prompts instead.
 
+## Output styles
+
+The plugin ships one output style, `neurospicy`. Select it with `/output-style` and pick
+`zerodahero-skills:neurospicy`.
+
+`neurospicy` shapes replies for a reader with ADHD or a similar working-memory load. Replies
+lead with the point, use plain short sentences, and end with one concrete next step. Long
+tasks repeat their full progress every phase, and tangents collect in one group at the end.
+See [`output-styles/neurospicy.md`](output-styles/neurospicy.md) for the full rules.
+
 ## Second review
 
 Run a second opinion from a different harness, model, or provider, then merge it into the
