@@ -24,7 +24,12 @@ run = [
   "echo 'Run /reload-plugins, or restart Claude Code, to load the update.'",
 ]
 
+[tasks."release:prepare"]
+description = "Set every manifest to a new version and prepend its changelog entry"
+usage = 'arg "<version>" help="The version to release, such as 0.7.0"'
+run = 'scripts/prepare-release.sh "${usage_version}"'
+
 [tasks.release]
-description = "Tag and push a zerodahero-skills release after checking the version is new"
-usage = 'arg "<version>" help="The version to release, such as 0.2.2"'
+description = "Tag and push a release of both plugins and the opencode package"
+usage = 'arg "<version>" help="The version to release, such as 0.7.0"'
 run = 'scripts/release.sh "${usage_version}"'

@@ -72,7 +72,12 @@ local linters = new Mapping<String, Step> {
     check = "scripts/check-opencode-agents.sh"
   }
   ["versions-match"] {
-    glob = List(".claude-plugin/plugin.json", "package.json")
+    glob =
+      List(
+        ".claude-plugin/plugin.json",
+        "package.json",
+        "plugins/plan-capture/.claude-plugin/plugin.json",
+      )
     check = "scripts/check-versions.sh"
   }
 }
